@@ -4,19 +4,26 @@ class Sbn
     
     def initialize(name = '', states = [])
       @name = name
+      @children = []
+      @states = []
+      @probabilities = {}
       set_states(states)
     end
     
     def add_child(node)
-      return if child == 
+      return if node == self
+      @children << node
+      node.add_parent(self)
     end
     
     def add_parent(node)
-      
+      return if node == self
+      @parents << node
+      node.add_child(self)
     end
     
     def set_states(states)
-      
+      @states = states
     end
     
     def set_probability(probability, event)
