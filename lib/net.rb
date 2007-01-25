@@ -1,18 +1,3 @@
-# used for defining enumerated constants
-class Object
-  def self.enums(*args)    
-    args.flatten.each_with_index do |const, i|
-      class_eval %(#{const} = #{i})
-    end
-  end
-  
-  def self.bitwise_enums(*args)    
-    args.flatten.each_with_index do |const, i|
-      class_eval %(#{const} = #{2**i})
-    end
-  end
-end
-
 class Sbn
   enums %w(INFERENCE_MODE_VARIABLE_ELIMINATION,
            INFERENCE_MODE_MARKOV_CHAIN_MONTE_CARLO)
@@ -23,7 +8,7 @@ class Sbn
     def initialize(name = '')
       @@net_count ||= 0
       @@net_count += 1
-      @name = name.empty? ? "Net #{@@net_count}" : name
+      @name = (name.empty? ? "net_#{@@net_count}" : name).to_sym
       @nodes = {}
       @evidence = {}
     end
@@ -33,7 +18,7 @@ class Sbn
     end
     
     def set_evidence(event)
-      @evidence = event
+      @evidence = event.symbolize_keys_and_values
     end
 
 
@@ -55,7 +40,7 @@ class Sbn
         state = e[nodename]
         state_frequencies[state] ||= 0
         state_frequencies[state] += 1
-        e.each |nname, nstate|
+        e.each do |nname, nstate|
           # if this node is already set in the evidence or we've already
           # generated a random state for this node, skip over it
           next if @evidence.has_key?(nname) or visited_nodes[nname]
