@@ -52,7 +52,6 @@ class Sbn
         relevant_e.each do |nname, nstate|
           # if this node is already set in the evidence or we've already
           # generated a random state for this node, skip over it
-          # next if @evidence.has_key?(nname) or visited_nodes[nname]
           e[nname] = @nodes[nname].get_random_state_with_markov_blanket(e)
         end
       end
