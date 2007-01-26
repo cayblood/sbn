@@ -89,6 +89,21 @@ class Sbn
       temp_probs.each {|e| sum += e[1] }
       sum
     end
+
+    def is_affected_by?(node, evidence, in_recursion = false)
+      return true if self == node
+      @parents.each do |p|
+        unless evidence.has_key?(p.name)
+          return p.is_affected_by?(node, evidence, true)
+        end
+      end
+      unless in_recursion
+        @children.each do |p|
+          return p.is_affected_by?(node, evidence, true)
+        end
+      end
+      false
+    end
     
   private
     def seek_state
