@@ -21,6 +21,8 @@ class NetTest < Test::Unit::TestCase
     rain.add_child(grass_wet)
     
     net.set_evidence :sprinkler => :false, :rain => :true
-    p net.query_node(:grass_wet)    
+    probs = net.query_node(:grass_wet)
+    assert (probs[:true] * 10).round == 9.0
+    assert (probs[:false] * 10).round == 1.0
   end
 end
