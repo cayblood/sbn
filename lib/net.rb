@@ -2,7 +2,7 @@ class Sbn
   enums %w(INFERENCE_MODE_VARIABLE_ELIMINATION,
            INFERENCE_MODE_MARKOV_CHAIN_MONTE_CARLO)
   
-  MCMC_NUM_SAMPLES = 1000
+  MCMC_NUM_SAMPLES = 2000
   
   class Net
     def initialize(name = '')
@@ -29,7 +29,6 @@ class Sbn
       @evidence = event.symbolize_keys_and_values
     end
 
-
   	# Returns the estimated posterior probability for the specified node based
   	# on previously-supplied evidence, using the Markov Chain Monte Carlo
   	# algorithm.  The MCMC algorithm generates each event by making a random
@@ -44,18 +43,18 @@ class Sbn
     def query_node(nodename)
       state_frequencies = {}
       e = generate_random_event
+      relevant_e = relevant_evidence(nodename, e)
       MCMC_NUM_SAMPLES.times do
-        visited_nodes = {}
         state = e[nodename]
         state_frequencies[state] ||= 0
         state_frequencies[state] += 1
-        e.each do |nname, nstate|
+        
+        relevant_e.each do |nname, nstate|
           # if this node is already set in the evidence or we've already
           # generated a random state for this node, skip over it
-          next if @evidence.has_key?(nname) or visited_nodes[nname]
+          # next if @evidence.has_key?(nname) or visited_nodes[nname]
           e[nname] = @nodes[nname].get_random_state_with_markov_blanket(e)
-          visited_nodes[nname] = true
-        end        
+        end
       end
       
       # normalize results
@@ -67,6 +66,15 @@ class Sbn
     end
     
   private
+    def relevant_evidence(nodename, evidence)
+      returnval = {}
+      evidence.each do |name, state|
+        next if @evidence.has_key?(name)
+        next unless @nodes[nodename].is_affected_by?(@nodes[name], evidence)
+        returnval[name] = state
+      end
+      returnval
+    end
   
     # Returns an event in which nodes that are not fixed by the evidence are set
     # to random states whose frequencies (after repeated calls) are consistent
