@@ -8,13 +8,21 @@ class Sbn
     def initialize(name = '')
       @@net_count ||= 0
       @@net_count += 1
-      @name = (name.empty? ? "net_#{@@net_count}" : name).to_sym
+      @name = (name.empty? ? "net_#{@@net_count}" : name.underscore).to_sym
       @nodes = {}
       @evidence = {}
     end
     
     def add_node(node)
       @nodes[node.name] = node
+    end
+    
+    def <<(obj)
+      if obj.is_a? Array
+        obj.each {|n| add_node(n) }
+      else
+        add_node(obj)
+      end
     end
     
     def set_evidence(event)
@@ -34,9 +42,10 @@ class Sbn
   	# into a "dynamic equilibrium" in which the long-run fraction of time spent
   	# in each state is proportional to its posterior probability.
     def query_node(nodename)
+      state_frequencies = {}
       e = generate_random_event
-      visited_nodes = {}
       MCMC_NUM_SAMPLES.times do
+        visited_nodes = {}
         state = e[nodename]
         state_frequencies[state] ||= 0
         state_frequencies[state] += 1

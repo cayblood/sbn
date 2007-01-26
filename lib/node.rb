@@ -1,8 +1,9 @@
 class Sbn
   class Node
-    attr_accessor :name, :states
+    attr_accessor :name, :states, :parents, :children
     
     def initialize(name = '', states = [], probabilities = [])
+      @@count ||= 0
       @name = name.to_sym
       @children = []
       @parents = []
@@ -18,13 +19,15 @@ class Sbn
     def add_child(node)
       return if node == self
       @children << node
-      node.add_parent(self)
+      node.parents << self
+      node.generate_state_table
     end
     
     def add_parent(node)
       return if node == self
       @parents << node
-      node.add_child(self)
+      node.children << self
+      generate_state_table
     end
     
     def set_states(states)
@@ -60,49 +63,25 @@ class Sbn
   	# cumulative sum of their probabilities exceeds our random number.    
     def get_random_state(event = {})
       event.symbolize_keys_and_values!
-      sum = 0.0
-      num = rand
-      returnval = nil
-      @states.each do |s|
-        returnval = s
-        r = evaluate_marginal(s, event)
-        sum += r
-        break if num < sum
-      end
-      returnval      
+      seek_state {|s| evaluate_marginal(s, event) }
     end
     
+  	# similar to get_random_state() except it evaluates a node's markov
+  	# blanket in addition to the node itself.
     def get_random_state_with_markov_blanket(event)
-      
+      event.symbolize_keys_and_values!
+      evaluations = []
+      @states.each {|s| evaluations << evaluate_markov_blanket(s, event) }
+      evaluations.normalize!
+      seek_state {|s| evaluations.shift }
     end
-    
-  private
-    def state_combinations
-      all_states = [@states]
-      @parents.each do |p|
-        c << event[p.name]
-        all_states << p.states
-      end
-      Combination.new(all_states).to_a
-    end
-  
+
     def generate_state_table
       return unless @probabilities
       probs = @probabilities.dup
       @state_table = state_combinations.collect {|e| [e, probs.shift] }
     end
-  
-    def remove_irrelevant_states(probabilities, state, evidence)
-      probabilities.reject! {|element| element.first.first != state }
-      index = 1
-      @parents.each do |node|
-        raise "Marginal cannot be evaluated because not all parent nodes are set" unless evidence.has_key?(node.name)
-        probabilities.reject! {|element| element.first[index] != evidence[node.name] }
-        index += 1
-      end
-      probabilities
-    end
-    
+
     def evaluate_marginal(state, event)
       temp_probs = @state_table.dup
       remove_irrelevant_states(temp_probs, state, event)
@@ -111,8 +90,48 @@ class Sbn
       sum
     end
     
+  private
+    def seek_state
+      sum = 0.0
+      num = rand
+      returnval = nil
+      @states.each do |s|
+        returnval = s
+        sum += yield(s)
+        break if num < sum
+      end
+      returnval      
+    end
+  
+    def state_combinations
+      all_states = [@states]
+      @parents.each {|p| all_states << p.states }
+      Combination.new(all_states).to_a
+    end
+  
+    def remove_irrelevant_states(probabilities, state, evidence)
+      # remove the states for this node
+      probabilities.reject! {|e| e.first.first != state }
+      index = 1
+      @parents.each do |parent|
+        raise "Marginal cannot be evaluated because not all parent nodes are set" unless evidence.has_key?(parent.name)
+        probabilities.reject! {|e| e.first[index] != evidence[parent.name] }
+        index += 1
+      end
+      @@count += 1
+      probabilities
+    end
+    
     def evaluate_markov_blanket(state, event)
-      
+      returnval = 1.0
+      temp_probs = @state_table.dup
+      remove_irrelevant_states(temp_probs, state, event)
+      temp = event[@name]
+      event[@name] = state
+      returnval *= evaluate_marginal(state, event)
+      @children.each {|child| returnval *= child.evaluate_marginal(event[child.name], event) }
+      event[@name] = temp
+      returnval
     end
   end
 end

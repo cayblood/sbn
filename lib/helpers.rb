@@ -21,6 +21,16 @@ class Array
   def symbolize_values!
     self.map! {|e| e.to_sym }
   end
+  
+  def normalize
+    sum = self.inject(0.0) {|sum, e| sum += e }
+    self.map {|e| e.to_f / sum }
+  end
+  
+  def normalize!
+    sum = self.inject(0.0) {|sum, e| sum += e }
+    self.map! {|e| e.to_f / sum }
+  end
 end
 
 class Hash
