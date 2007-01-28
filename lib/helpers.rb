@@ -13,13 +13,25 @@ class Object
   end
 end
 
+class String
+  def to_underscore_sym
+    self.titleize.gsub(/\s+/, '').underscore.to_sym
+  end
+end
+
+class Symbol
+  def to_underscore_sym
+    self.to_s.titleize.gsub(/\s+/, '').underscore.to_sym
+  end
+end
+
 class Array
   def symbolize_values
-    self.map {|e| e.to_sym }
+    self.map {|e| e.to_underscore_sym }
   end
   
   def symbolize_values!
-    self.map! {|e| e.to_sym }
+    self.map! {|e| e.to_underscore_sym }
   end
   
   def normalize
@@ -36,15 +48,18 @@ end
 class Hash
   def symbolize_keys_and_values
     inject({}) do |options, (key, value)|
-      options[key.to_sym] = value.to_sym
+      key = key.to_underscore_sym
+      value = value.to_underscore_sym
+      options[key] = value
       options
     end
   end
   
   def symbolize_keys_and_values!
     keys.each do |key|
-      self[key.to_sym] = self[key].to_sym
-      delete(key) unless key.is_a?(Symbol)
+      newkey = key.to_underscore_sym
+      self[newkey] = self[key].to_underscore_sym
+      delete(key) unless key == newkey
     end
     self
   end
