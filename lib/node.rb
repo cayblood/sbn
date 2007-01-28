@@ -1,10 +1,9 @@
 class Sbn
   class Node
-    attr_accessor :name, :states, :parents, :children
+    attr_reader :name, :states, :parents, :children, :probability_table
     
     def initialize(name = '', states = [], probabilities = [])
-      @@count ||= 0
-      @name = name.to_sym
+      @name = name.to_underscore_sym
       @children = []
       @parents = []
       @states = []
@@ -20,20 +19,20 @@ class Sbn
       return if node == self
       @children << node
       node.parents << self
-      node.generate_state_table
+      node.generate_probability_table
     end
     
     def add_parent(node)
       return if node == self
       @parents << node
       node.children << self
-      generate_state_table
+      generate_probability_table
     end
     
     def set_states(states)
       states.symbolize_values!
       @states = states
-      generate_state_table
+      generate_probability_table
     end
     
     def set_probability(probability, event)
@@ -41,12 +40,12 @@ class Sbn
       c = [event[@name]]
       index = state_combinations.index(c)
       @probabilities[index] = probability
-      generate_state_table
+      generate_probability_table
     end
     
     def set_probabilities(probs)
       @probabilities = probs
-      generate_state_table
+      generate_probability_table
     end
 
   	# A node can't be evaluated unless its parent nodes have
@@ -76,14 +75,14 @@ class Sbn
       seek_state {|s| evaluations.shift }
     end
 
-    def generate_state_table
+    def generate_probability_table
       return unless @probabilities
       probs = @probabilities.dup
-      @state_table = state_combinations.collect {|e| [e, probs.shift] }
+      @probability_table = state_combinations.collect {|e| [e, probs.shift] }
     end
 
     def evaluate_marginal(state, event)
-      temp_probs = @state_table.dup
+      temp_probs = @probability_table.dup
       remove_irrelevant_states(temp_probs, state, event)
       sum = 0.0
       temp_probs.each {|e| sum += e[1] }
@@ -91,18 +90,22 @@ class Sbn
     end
 
     def is_affected_by?(node, evidence, in_recursion = false)
-      return true if self == node
-      @parents.each do |p|
-        unless evidence.has_key?(p.name)
-          return p.is_affected_by?(node, evidence, true)
+      returnval = false
+      if self == node
+        returnval = true 
+      else
+        @parents.each do |p|
+          unless evidence.has_key?(p.name)
+            returnval = true if p.is_affected_by?(node, evidence, true)
+          end
+        end
+        unless in_recursion
+          @children.each do |p|
+            returnval = true if p.is_affected_by?(node, evidence, true)
+          end
         end
       end
-      unless in_recursion
-        @children.each do |p|
-          return p.is_affected_by?(node, evidence, true)
-        end
-      end
-      false
+      returnval
     end
     
   private
@@ -119,27 +122,27 @@ class Sbn
     end
   
     def state_combinations
-      all_states = [@states]
+      all_states = []
       @parents.each {|p| all_states << p.states }
+      all_states << @states
       Combination.new(all_states).to_a
     end
   
     def remove_irrelevant_states(probabilities, state, evidence)
       # remove the states for this node
-      probabilities.reject! {|e| e.first.first != state }
-      index = 1
+      probabilities.reject! {|e| e.first.last != state }
+      index = 0
       @parents.each do |parent|
         raise "Marginal cannot be evaluated because not all parent nodes are set" unless evidence.has_key?(parent.name)
         probabilities.reject! {|e| e.first[index] != evidence[parent.name] }
         index += 1
       end
-      @@count += 1
       probabilities
     end
     
     def evaluate_markov_blanket(state, event)
       returnval = 1.0
-      temp_probs = @state_table.dup
+      temp_probs = @probability_table.dup
       remove_irrelevant_states(temp_probs, state, event)
       temp = event[@name]
       event[@name] = state
