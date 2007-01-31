@@ -22,7 +22,7 @@
 ]>
 <bif version="0.3">
   <network>
-    <name>Grass Wetness Belief Net</name>
+    <name>Grass_Wetness_Belief_Net</name>
 
     <!-- Variables -->
     <variable type="nature">
@@ -31,7 +31,7 @@
       <outcome>false</outcome>
     </variable>
     <variable type="nature">
-      <name>Grass Wet</name>
+      <name>Grass_Wet</name>
       <outcome>true</outcome>
       <outcome>false</outcome>
     </variable>
@@ -52,7 +52,7 @@
       <table>0.5 0.5</table>
     </definition>
     <definition>
-      <for>Grass Wet</for>
+      <for>Grass_Wet</for>
       <given>Sprinkler</given>
       <given>Rain</given>
       <table>0.99 0.01 0.9 0.1 0.9 0.1 0.0 1.0</table>

@@ -23,6 +23,10 @@ class NetTest < Test::Unit::TestCase
     probs = @net.query_node(:grass_wet)
     assert (probs[:true] * 10).round == 9.0
     assert (probs[:false] * 10).round == 1.0
+    probs = @net.query_node(:cloudy)
+    p probs
+    assert (probs[:true] * 100).round == 88
+    assert (probs[:false] * 100).round == 12
   end
   
   def test_import_export
