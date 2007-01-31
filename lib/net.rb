@@ -73,8 +73,6 @@ class Sbn
         state_frequencies[state] += 1
         
         relevant_e.each do |nname, nstate|
-          # if this node is already set in the evidence or we've already
-          # generated a random state for this node, skip over it
           e[nname] = @nodes[nname].get_random_state_with_markov_blanket(e)
         end
       end
@@ -177,7 +175,7 @@ class Sbn
       returnval = {}
       evidence.each do |name, state|
         next if @evidence.has_key?(name)
-        next unless @nodes[nodename].is_affected_by?(@nodes[name], evidence)
+        next unless @nodes[nodename].is_explained_away?(@nodes[name], evidence)
         returnval[name] = state
       end
       returnval

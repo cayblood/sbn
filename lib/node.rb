@@ -88,24 +88,26 @@ class Sbn
       temp_probs.each {|e| sum += e[1] }
       sum
     end
-
-    def is_affected_by?(node, evidence, in_recursion = false)
+    
+    def has_ancestor?(node)
       returnval = false
       if self == node
-        returnval = true 
+        returnval = true
       else
         @parents.each do |p|
-          unless evidence.has_key?(p.name)
-            returnval = true if p.is_affected_by?(node, evidence, true)
-          end
-        end
-        unless in_recursion
-          @children.each do |p|
-            returnval = true if p.is_affected_by?(node, evidence, true)
-          end
+          returnval = true if p.has_ancestor?(node)
         end
       end
-      returnval
+      returnval        
+    end
+    
+    # TODO: fix this
+    def has_unset_path_to_ancestor?(node)
+      false
+    end
+
+    def is_explained_away?(node, evidence)
+      has_ancestor?(node) and !has_unset_path_to_ancestor?(node)
     end
     
   private
