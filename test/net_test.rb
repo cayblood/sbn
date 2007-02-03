@@ -13,20 +13,27 @@ class NetTest < Test::Unit::TestCase
     @cloudy.add_child(@rain)
     @sprinkler.add_child(@grass_wet)
     @rain.add_child(@grass_wet)
+    @evidence = {:sprinkler => :false, :rain => :true}
   end
   
   def teardown
   end
   
+  def test_is_explained_away?
+    @net.set_evidence @evidence
+    assert @grass_wet.is_explained_away?(@cloudy, @evidence)
+  end
+  
   def test_mcmc_inference
-    @net.set_evidence :sprinkler => :false, :rain => :true
+    @net.set_evidence @evidence
     probs = @net.query_node(:grass_wet)
     assert (probs[:true] * 10).round == 9.0
     assert (probs[:false] * 10).round == 1.0
     probs = @net.query_node(:cloudy)
-    p probs
-    assert (probs[:true] * 100).round == 88
-    assert (probs[:false] * 100).round == 12
+    rounded_true_prob = (probs[:true] * 100).round
+    rounded_false_prob = (probs[:false] * 100).round
+    assert rounded_true_prob >= 87 and rounded_true_prob <= 89
+    assert rounded_false_prob >= 11 and rounded_false_prob <= 13
   end
   
   def test_import_export

@@ -89,27 +89,36 @@ class Sbn
       sum
     end
     
-    def has_ancestor?(node)
+    def has_unset_path_to_ancestor?(node, evidence)
       returnval = false
       if self == node
         returnval = true
       else
         @parents.each do |p|
+          next if evidence[p.name]
           returnval = true if p.has_ancestor?(node)
         end
       end
       returnval        
     end
     
-    # TODO: fix this
-    def has_unset_path_to_ancestor?(node)
-      false
+    # Returns true if the passed-in node is
+    # a direct ancestor of this node and all
+    # paths to it are blocked by nodes with
+    # set evidence
+    def is_explained_away?(node, evidence)
+      returnval = true
+      if self == node
+        returnval = false
+      else
+        @parents.each do |p|
+          next if evidence[p.name]
+          returnval = false unless p.is_explained_away?(node, evidence)
+        end
+      end
+      returnval
     end
 
-    def is_explained_away?(node, evidence)
-      has_ancestor?(node) and !has_unset_path_to_ancestor?(node)
-    end
-    
   private
     def seek_state
       sum = 0.0
