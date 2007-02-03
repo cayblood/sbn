@@ -16,24 +16,6 @@ class NodeTest < Test::Unit::TestCase
   
   def test_get_random_state
     n = Sbn::Node.new('george', ['good', 'bad', 'ugly'], [0.25, 0.25, 0.5])
-    p n.get_random_state
-    p n.get_random_state
-    p n.get_random_state
-    p n.get_random_state
-    p n.get_random_state
-    p n.get_random_state
-    p n.get_random_state
-    p n.get_random_state
-    p n.get_random_state
-    p n.get_random_state
-    p n.get_random_state
-    p n.get_random_state
-    p n.get_random_state
-    p n.get_random_state
-    p n.get_random_state
-    p n.get_random_state
-    p n.get_random_state
-    p n.get_random_state
-    p n.get_random_state
+    assert true
   end
 end

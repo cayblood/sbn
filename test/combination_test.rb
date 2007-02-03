@@ -10,7 +10,7 @@ class CombinationTest < Test::Unit::TestCase
   end
   
   def test_each
-    @c.each {|comb| p comb }
+    # @c.each {|comb| p comb }
     assert true
   end
   
