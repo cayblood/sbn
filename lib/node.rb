@@ -129,7 +129,7 @@ class Sbn
         sum += yield(s)
         break if num < sum
       end
-      returnval      
+      returnval    
     end
   
     def state_combinations

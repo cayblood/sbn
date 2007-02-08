@@ -91,7 +91,7 @@ class Sbn
       returnval = {}
       evidence.each do |name, state|
         next if @evidence.has_key?(name)
-        next if @nodes[nodename].is_explained_away?(@nodes[name], @evidence)
+        # next if @nodes[nodename].is_explained_away?(@nodes[name], @evidence)
         returnval[name] = state
       end
       returnval
@@ -101,12 +101,16 @@ class Sbn
     # to random states whose frequencies (after repeated calls) are consistent
     # with the network's joint probability distribution.
     def generate_random_event
-      returnval = @evidence.dup
-      @nodes.each do |name, node|
-        next if @evidence.has_key?(name)
-        returnval[name] = node.get_random_state(returnval) if node.can_be_evaluated?(returnval)
+      unset_nodes = @nodes.reject {|name, node| @evidence.has_key? name }
+      new_evidence = @evidence.dup
+      until unset_nodes.empty? do
+        settable_nodes = unset_nodes.reject {|name, node| !node.can_be_evaluated?(new_evidence) }
+        settable_nodes.each do |name, node|
+          unset_nodes.delete(name)
+          new_evidence[name] = node.get_random_state(new_evidence)
+        end
       end
-      returnval
+      new_evidence
     end
   end
 end
