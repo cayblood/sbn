@@ -39,8 +39,8 @@ class NetTest < Test::Unit::TestCase
     probs = @net.query_node(:sprinkler)
     rounded_true_prob = (probs[:true] * 100).round
     rounded_false_prob = (probs[:false] * 100).round
-    assert rounded_true_prob >= 29 and rounded_true_prob <= 31
-    assert rounded_false_prob >= 69 and rounded_false_prob <= 71
+    assert rounded_true_prob >= 28 and rounded_true_prob <= 32
+    assert rounded_false_prob >= 68 and rounded_false_prob <= 72
   end
   
   def test_import_export
