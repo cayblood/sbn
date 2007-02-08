@@ -29,12 +29,12 @@ class Sbn
       end
       xml.bif :version => 0.3 do
         xml.network do
-          xml.name(@name.to_s.titleize)
+          xml.name(@name.to_s)
           xml.text! "\n"
           xml.comment! "Variables"
           @nodes.each do |name, node|
             xml.variable(:type => "nature") do
-              xml.name(name.to_s.titleize)
+              xml.name(name.to_s)
               node.states.each {|s| xml.outcome(s.to_s) }
             end
           end
@@ -42,8 +42,8 @@ class Sbn
           xml.comment! "Probability distributions"
           @nodes.each do |name, node|
             xml.definition do
-              xml.for(name.to_s.titleize)
-              node.parents.each {|parent| xml.given(parent.name.to_s.titleize) }
+              xml.for(name.to_s)
+              node.parents.each {|parent| xml.given(parent.name.to_s) }
               xml.table(node.probability_table.transpose.last.join(' '))
             end
           end
