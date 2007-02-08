@@ -29,11 +29,13 @@ class NetTest < Test::Unit::TestCase
     probs = @net.query_node(:grass_wet)
     assert (probs[:true] * 10).round == 9.0
     assert (probs[:false] * 10).round == 1.0
+    
     probs = @net.query_node(:cloudy)
     rounded_true_prob = (probs[:true] * 100).round
     rounded_false_prob = (probs[:false] * 100).round
     assert rounded_true_prob >= 86 and rounded_true_prob <= 90
     assert rounded_false_prob >= 10 and rounded_false_prob <= 14
+    
     @evidence = {}
     @net.set_evidence(@evidence)
     probs = @net.query_node(:sprinkler)
@@ -41,11 +43,18 @@ class NetTest < Test::Unit::TestCase
     rounded_false_prob = (probs[:false] * 100).round
     assert rounded_true_prob >= 28 and rounded_true_prob <= 32
     assert rounded_false_prob >= 68 and rounded_false_prob <= 72
+    
     probs = @net.query_node(:rain)
     rounded_true_prob = (probs[:true] * 100).round
     rounded_false_prob = (probs[:false] * 100).round
-    assert rounded_true_prob >= 48 and rounded_true_prob <= 52
-    assert rounded_false_prob >= 48 and rounded_false_prob <= 52
+    assert rounded_true_prob >= 45 and rounded_true_prob <= 55
+    assert rounded_false_prob >= 45 and rounded_false_prob <= 55
+
+    probs = @net.query_node(:grass_wet)
+    rounded_true_prob = (probs[:true] * 100).round
+    rounded_false_prob = (probs[:false] * 100).round
+    assert rounded_true_prob >= 60 and rounded_true_prob <= 70
+    assert rounded_false_prob >= 30 and rounded_false_prob <= 40
   end
   
   def test_import_export
