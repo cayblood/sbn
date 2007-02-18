@@ -32,19 +32,19 @@ class Sbn
           xml.name(@name.to_s)
           xml.text! "\n"
           xml.comment! "Variables"
-          @nodes.each do |name, node|
+          @variables.each do |name, variable|
             xml.variable(:type => "nature") do
               xml.name(name.to_s)
-              node.states.each {|s| xml.outcome(s.to_s) }
+              variable.states.each {|s| xml.outcome(s.to_s) }
             end
           end
           xml.text! "\n"
           xml.comment! "Probability distributions"
-          @nodes.each do |name, node|
+          @variables.each do |name, variable|
             xml.definition do
               xml.for(name.to_s)
-              node.parents.each {|parent| xml.given(parent.name.to_s) }
-              xml.table(node.probability_table.transpose.last.join(' '))
+              variable.parents.each {|parent| xml.given(parent.name.to_s) }
+              xml.table(variable.probability_table.transpose.last.join(' '))
             end
           end
         end
@@ -61,27 +61,27 @@ class Sbn
       # find net name
       returnval = Net.new(netname)
       
-      # find nodes
-      nodes = {}
-      node_elements = doc['network'].first['variable'].each do |var|
-        nodename = var['name'].first
+      # find variables
+      variables = {}
+      variable_elements = doc['network'].first['variable'].each do |var|
+        varname = var['name'].first
         states = var['outcome']
         table = nil
         doc['network'].first['definition'].each do |defn|
-          if defn['for'].first == nodename
+          if defn['for'].first == varname
             table = defn['table'].first.split.map {|prob| prob.to_f }
           end
         end
-        nodes[nodename] = Node.new(nodename, states, table)
+        variables[varname] = Variable.new(varname, states, table)
       end
 
-      # find relationships between nodes
+      # find relationships between variables
       doc['network'].first['definition'].each do |defn|
-        nodename = defn['for'].first
+        varname = defn['for'].first
         parents = defn['given']
-        parents.each {|p| nodes[nodename].add_parent(nodes[p]) } if parents
+        parents.each {|p| variables[varname].add_parent(variables[p]) } if parents
       end
-      returnval << nodes.values
+      returnval << variables.values
       returnval
     end
   end
