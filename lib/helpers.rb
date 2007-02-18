@@ -64,3 +64,37 @@ class Hash
     self
   end
 end
+
+module Enumerable
+  ##
+  # Sum of all the elements of the Enumerable
+  def sum
+    return self.inject(0) { |acc, i| acc + i }
+  end
+
+  ##
+  # Average of all the elements of the Enumerable
+  #
+  # The Enumerable must respond to #length
+  def average
+    return self.sum / self.length.to_f
+  end
+
+  ##
+  # Sample variance of all the elements of the Enumerable
+  #
+  # The Enumerable must respond to #length
+  def sample_variance
+    avg = self.average
+    sum = self.inject(0) { |acc, i| acc + (i - avg) ** 2 }
+    return (1 / self.length.to_f * sum)
+  end
+
+  ##
+  # Standard deviation of all the elements of the Enumerable
+  #
+  # The Enumerable must respond to #length
+  def standard_deviation
+    return Math.sqrt(self.sample_variance)
+  end
+end

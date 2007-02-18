@@ -1,5 +1,5 @@
 class Sbn
-  class Node
+  class Variable
     attr_reader :name, :states, :parents, :children, :probability_table
     
     def initialize(name = '', states = [], probabilities = [])
@@ -7,6 +7,7 @@ class Sbn
       @children = []
       @parents = []
       @states = []
+      @state_frequencies = {} # used for storing training data
       set_states(states)
       set_probabilities(probabilities)
     end
@@ -15,17 +16,17 @@ class Sbn
       @name.to_s
     end
     
-    def add_child(node)
-      return if node == self
-      @children << node
-      node.parents << self
-      node.generate_probability_table
+    def add_child(variable)
+      return if variable == self
+      @children << variable
+      variable.parents << self
+      variable.generate_probability_table
     end
     
-    def add_parent(node)
-      return if node == self
-      @parents << node
-      node.children << self
+    def add_parent(variable)
+      return if variable == self
+      @parents << variable
+      variable.children << self
       generate_probability_table
     end
     
@@ -48,7 +49,7 @@ class Sbn
       generate_probability_table
     end
 
-  	# A node can't be evaluated unless its parent nodes have
+  	# A variable can't be evaluated unless its parents have
   	# been observed    
     def can_be_evaluated?(evidence)
       returnval = true
@@ -65,8 +66,8 @@ class Sbn
       seek_state {|s| evaluate_marginal(s, event) }
     end
     
-  	# similar to get_random_state() except it evaluates a node's markov
-  	# blanket in addition to the node itself.
+  	# similar to get_random_state() except it evaluates a variable's markov
+  	# blanket in addition to the variable itself.
     def get_random_state_with_markov_blanket(event)
       event.symbolize_keys_and_values!
       evaluations = []
@@ -89,31 +90,31 @@ class Sbn
       sum
     end
     
-    def has_unset_path_to_ancestor?(node, evidence)
+    def has_unset_path_to_ancestor?(variable, evidence)
       returnval = false
-      if self == node
+      if self == variable
         returnval = true
       else
         @parents.each do |p|
           next if evidence[p.name]
-          returnval = true if p.has_ancestor?(node)
+          returnval = true if p.has_ancestor?(variable)
         end
       end
       returnval        
     end
     
-    # Returns true if the passed-in node is
-    # a direct ancestor of this node and all
-    # paths to it are blocked by nodes with
+    # Returns true if the passed-in variable is
+    # a direct ancestor of this variable and all
+    # paths to it are blocked by variables with
     # set evidence
-    def is_explained_away?(node, evidence)
+    def is_explained_away?(variable, evidence)
       returnval = true
-      if self == node
+      if self == variable
         returnval = false
       else
         @parents.each do |p|
           next if evidence[p.name]
-          returnval = false unless p.is_explained_away?(node, evidence)
+          returnval = false unless p.is_explained_away?(variable, evidence)
         end
       end
       returnval
@@ -140,11 +141,11 @@ class Sbn
     end
   
     def remove_irrelevant_states(probabilities, state, evidence)
-      # remove the states for this node
+      # remove the states for this variable
       probabilities.reject! {|e| e.first.last != state }
       index = 0
       @parents.each do |parent|
-        raise "Marginal cannot be evaluated because not all parent nodes are set" unless evidence.has_key?(parent.name)
+        raise "Marginal cannot be evaluated because not all parent variables are set" unless evidence.has_key?(parent.name)
         probabilities.reject! {|e| e.first[index] != evidence[parent.name] }
         index += 1
       end
