@@ -21,8 +21,8 @@ class Sbn
         state_frequencies[state] ||= 0
         state_frequencies[state] += 1
 
-        relevant_e.each do |nname, nstate|
-          e[nname] = @variables[nname].get_random_state_with_markov_blanket(e)
+        relevant_e.each do |vname, vstate|
+          e[vname] = @variables[vname].get_random_state_with_markov_blanket(e)
         end
       end
 
