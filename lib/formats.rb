@@ -72,7 +72,7 @@ class Sbn
             table = defn['table'].first.split.map {|prob| prob.to_f }
           end
         end
-        variables[varname] = Variable.new(varname, states, table)
+        variables[varname] = Variable.new(varname, table, states)
       end
 
       # find relationships between variables

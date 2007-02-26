@@ -4,10 +4,10 @@ require File.dirname(__FILE__) + '/../lib/sbn4r'
 class NetTest < Test::Unit::TestCase
   def setup
     @net       = Sbn::Net.new("Grass Wetness Belief Net")
-    @cloudy    = Sbn::Variable.new(:cloudy, [:true, :false], [0.5, 0.5])
-    @sprinkler = Sbn::Variable.new(:sprinkler, [:true, :false], [0.1, 0.9, 0.5, 0.5])
-    @rain      = Sbn::Variable.new(:rain, [:true, :false], [0.8, 0.2, 0.2, 0.8])
-    @grass_wet = Sbn::Variable.new(:grass_wet, [:true, :false], [0.99, 0.01, 0.9, 0.1, 0.9, 0.1, 0.0, 1.0])
+    @cloudy    = Sbn::Variable.new(:cloudy, [0.5, 0.5])
+    @sprinkler = Sbn::Variable.new(:sprinkler, [0.1, 0.9, 0.5, 0.5])
+    @rain      = Sbn::Variable.new(:rain, [0.8, 0.2, 0.2, 0.8])
+    @grass_wet = Sbn::Variable.new(:grass_wet, [0.99, 0.01, 0.9, 0.1, 0.9, 0.1, 0.0, 1.0])
     @net << [@cloudy, @sprinkler, @rain, @grass_wet]
     @cloudy.add_child(@sprinkler)
     @cloudy.add_child(@rain)
@@ -17,11 +17,6 @@ class NetTest < Test::Unit::TestCase
   end
   
   def teardown
-  end
-  
-  def test_is_explained_away?
-    @net.set_evidence @evidence
-    assert @grass_wet.is_explained_away?(@cloudy, @evidence)
   end
   
   def test_mcmc_inference
