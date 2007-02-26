@@ -57,7 +57,7 @@ class Sbn
       newevidence = {}
       evidence.each do |key, val|
         key = key.to_sym
-        if @variables[key].is_a? StringVariable
+        if @variables[key].is_a?(StringVariable) or @variables[key].is_a?(NumericVariable)
           newevidence[key] = val
         else
           newevidence[key] = val.to_sym
