@@ -28,13 +28,12 @@ class NetTest < Test::Unit::TestCase
       {:category => :gas, :text => 'gas'},
       {:category => :gas, :text => 'gas'}
     ])
-    @net.variables.each do |k, v|
-      p v.name
-      p v.probability_table
-      v.parents.each {|p| p p.name }
-      puts
-      puts
-    end
-    assert true
+    probs = @category.probability_table.dup
+    food_prob = probs.shift.pop
+    groceries_prob = probs.shift.pop
+    gas_prob = probs.shift.pop
+    assert_in_delta food_prob, 0.333, 0.001
+    assert_in_delta groceries_prob, 0.333, 0.001
+    assert_in_delta gas_prob, 0.333, 0.001
   end
 end
