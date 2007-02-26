@@ -1,17 +1,31 @@
 class Sbn
   class Variable
     NEGLIGIBLE_PROBABILITY = 0.0001
+    
+    def is_complete_evidence?(evidence)
+      varnames = [evidence_name.to_s]
+      @parents.each {|p| varnames << p.name.to_s }
+      
+      # ignore covariables when determining whether evidence is complete or not
+      varnames.map! do |n|
+        n = n.split('_').first if n =~ /covar/
+        n
+      end
+      varnames.uniq!
+      varnames.sort!
+      
+      keys = evidence.keys.map {|k| k.to_s }
+      keys.sort!
+      varnames & keys == varnames
+    end
 
     def add_training_set(evidence)
       # reject incomplete evidence sets
-      varnames = [@name]
-      @parents.each {|p| varnames << p.name }
-      varnames.sort!
-      raise "Incomplete training data" unless varnames & evidence.keys.sort == varnames
-
+      raise "Incomplete training data" unless is_complete_evidence?(evidence)
       combination_instance = []
-      @parents.each {|p| combination_instance << evidence[p.name]}
-      combination_instance << evidence[@name]
+      @parents.each {|p| combination_instance << p.get_observed_state(evidence) }
+      combination_instance << get_observed_state(evidence)
+      @state_frequencies[combination_instance] ||= 0      
       @state_frequencies[combination_instance] += 1
     end
     
@@ -19,10 +33,12 @@ class Sbn
       sum = 0.0
       @state_frequencies.values.each {|val| sum += val.to_f }
       probabilities = []
-      count_of_zero_prob_states = 0
+      count_of_zero_prob_states = count_of_nonzero_prob_states = 0
       state_combinations.each do |comb|
+        @state_frequencies[comb] ||= 0
         prob = @state_frequencies[comb] / sum.to_f
-        probabilities << prob == 0 ? NEGLIGIBLE_PROBABILITY : prob / sum.to_f
+        probabilities << (prob == 0 ? NEGLIGIBLE_PROBABILITY : (prob / sum.to_f))
+        p probabilities
         if prob == 0
           count_of_zero_prob_states += 1
         else
@@ -45,12 +61,16 @@ class Sbn
     # for all variables in the network.  Constructs probability tables for each variable
     # based on the data.
     def train(data)
-      # discard incomplete evidence sets
-      varnames = @variables.keys.sort
-      data.reject! {|evidence_set| evidence_set.keys.sort != varnames }
-
-      data.each {|evidence| @variables.each {|key, val| val.add_training_set(evidence) } }
-      @variables.each {|key, val| val.set_probabilities_from_training_data }
+      data.each {|evidence| add_training_set(evidence) }
+      set_probabilities_from_training_data
+    end
+    
+    def add_training_set(evidence)
+      @variables.each {|key, val| val.add_training_set(evidence) }
+    end
+    
+    def set_probabilities_from_training_data
+      @variables.each {|key, val| val.set_probabilities_from_training_data }      
     end
   end
 end

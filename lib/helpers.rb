@@ -17,6 +17,16 @@ class String
   def to_underscore_sym
     self.titleize.gsub(/\s+/, '').underscore.to_sym
   end
+
+  def ngrams(len = 1)
+    ngrams = []
+    (0..size - len).each do |n|
+      ng = self[n...(n + len)]
+      ngrams.push(ng)
+      yield ng if block_given?
+    end
+    ngrams
+  end
 end
 
 class Symbol

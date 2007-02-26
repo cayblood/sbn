@@ -1,7 +1,6 @@
+require File.dirname(__FILE__) + '/variable'
+
 class Sbn
-  class Variable
-  end
-  
   class NumericVariable < Variable
   end
 end

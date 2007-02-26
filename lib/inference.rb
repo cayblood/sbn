@@ -15,13 +15,13 @@ class Sbn
     def query_variable(varname)
       state_frequencies = {}
       e = generate_random_event
-      relevant_e = relevant_evidence(varname, e)
+      relevant_evidence = e.reject {|key, val| @variables[key].set_in_evidence?(@evidence) }
       MCMC_NUM_SAMPLES.times do
         state = e[varname]
         state_frequencies[state] ||= 0
         state_frequencies[state] += 1
 
-        relevant_e.each do |vname, vstate|
+        relevant_evidence.each do |vname, vstate|
           e[vname] = @variables[vname].get_random_state_with_markov_blanket(e)
         end
       end
@@ -35,22 +35,11 @@ class Sbn
     end
 
   private
-    def relevant_evidence(varname, evidence)
-      returnval = {}
-      evidence.each do |name, state|
-        next if @evidence.has_key?(name)
-        # TODO: figure out if this can safely be used to speed up inference
-        # next if @variables[varname].is_explained_away?(@variables[name], @evidence)
-        returnval[name] = state
-      end
-      returnval
-    end
-
     # Returns an event in which variables that are not fixed by the evidence are set
     # to random states whose frequencies (after repeated calls) are consistent
     # with the network's joint probability distribution.
     def generate_random_event
-      unset_variables = @variables.reject {|name, variable| @evidence.has_key? name }
+      unset_variables = @variables.reject {|name, variable| variable.set_in_evidence?(@evidence) }
       new_evidence = @evidence.dup
       until unset_variables.empty? do
         settable_variables = unset_variables.reject {|name, variable| !variable.can_be_evaluated?(new_evidence) }

@@ -16,13 +16,18 @@ class Sbn
     end
     
     def add_variable(variable)
+      if @variables.has_key? variable.name
+        raise "Variable of same name has already been added to this net"
+      end
       @variables[variable.name] = variable
     end
     
     def ==(net)
       returnval = true
       returnval = false unless net.name == @name
-      returnval = false unless @variables.keys.map {|k| k.to_s}.sort == net.variables.keys.map {|k| k.to_s}.sort
+      unless @variables.keys.map {|k| k.to_s}.sort == net.variables.keys.map {|k| k.to_s}.sort
+        returnval = false
+      end
       net.variables.each do |name, variable|
         if @variables.has_key? name
           parent_names = []
@@ -48,8 +53,21 @@ class Sbn
       end
     end
     
+    def symbolize_evidence(evidence)
+      newevidence = {}
+      evidence.each do |key, val|
+        key = key.to_sym
+        if @variables[key].is_a? StringVariable
+          newevidence[key] = val
+        else
+          newevidence[key] = val.to_sym
+        end
+      end
+      newevidence
+    end
+    
     def set_evidence(event)
-      @evidence = event.symbolize_keys_and_values
+      @evidence = symbolize_evidence(event)
     end
   end
 end
