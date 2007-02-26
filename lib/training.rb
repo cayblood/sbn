@@ -37,8 +37,7 @@ class Sbn
       state_combinations.each do |comb|
         @state_frequencies[comb] ||= 0
         prob = @state_frequencies[comb] / sum.to_f
-        probabilities << (prob == 0 ? NEGLIGIBLE_PROBABILITY : (prob / sum.to_f))
-        p probabilities
+        probabilities << (prob == 0 ? NEGLIGIBLE_PROBABILITY : prob)
         if prob == 0
           count_of_zero_prob_states += 1
         else
