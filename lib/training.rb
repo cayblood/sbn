@@ -22,14 +22,18 @@ class Sbn
     def add_training_set(evidence)
       # reject incomplete evidence sets
       raise "Incomplete training data" unless is_complete_evidence?(evidence)
-      combination_instance = []
-      @parents.each {|p| combination_instance << p.get_observed_state(evidence) }
-      combination_instance << get_observed_state(evidence)
-      @state_frequencies[combination_instance] ||= 0      
-      @state_frequencies[combination_instance] += 1
+      
+      # Because string variables add new variables to the net during training,
+      # the process of determining state frequencies has to be deferred until
+      # the end.  For now, we'll just store the evidence and use it later.
+      # In the future, this code should be optimized to avoid unnecessary
+      # duplication of training data.
+      @training_data ||= []
+      @training_data << evidence
     end
-    
+
     def set_probabilities_from_training_data
+      accumulate_state_frequencies
       sum = 0.0
       @state_frequencies.values.each {|val| sum += val.to_f }
       probabilities = []
@@ -53,6 +57,17 @@ class Sbn
       # assign new probabilities
       set_probabilities(probabilities)
     end
+
+  private
+    def accumulate_state_frequencies
+      @training_data.each do |evidence|
+        combination_instance = []
+        @parents.each {|p| combination_instance << p.get_observed_state(evidence) }
+        combination_instance << get_observed_state(evidence)
+        @state_frequencies[combination_instance] ||= 0      
+        @state_frequencies[combination_instance] += 1
+      end
+    end  
   end
   
   class Net
@@ -65,6 +80,7 @@ class Sbn
     end
     
     def add_training_set(evidence)
+      evidence = symbolize_evidence(evidence)
       @variables.each {|key, val| val.add_training_set(evidence) }
     end
     
