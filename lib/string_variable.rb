@@ -13,7 +13,7 @@ class Sbn
     end
     
     def get_observed_state(evidence)
-      evidence[@manager_name].downcase.include?(@text_to_match) ? :true : :false
+      evidence[@manager_name].include?(@text_to_match) ? :true : :false
     end
   end
   
