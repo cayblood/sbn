@@ -41,23 +41,36 @@ class Sbn
       increment_amount_for_second_stdev = stdev * 2.0 / @state_count_two.to_f
       current_position = average - (stdev * 2.0)
       
-      incrementor = Proc.new do |amount_to_increment|
-        @state_thresholds << current_position
-        current_position += amount_to_increment
-      end
-        
-      
       # start on the left, two standard deviations away from the average
       (@state_count_two / 2).times do
         @state_thresholds << current_position
         current_position += increment_amount_for_second_stdev
       end
-      
+
+      # continue to add thresholds within the first standard deviation
       @state_count_one.times do
-        
+        @state_thresholds << current_position
+        current_position += increment_amount_for_first_stdev
+      end
+
+      # add thresholds to the last standard deviation
+      (@state_count_two / 2).times do
+        @state_thresholds << current_position
+        current_position += increment_amount_for_second_stdev
       end
       
+      @states = []
+      @state_thresholds.each_index do |i|
+        if i == 0
+          @states << [nil, @state_thresholds[i]]
+        else
+          @states << [@state_thresholds[i - 1], @state_thresholds[i]]
+        end
+      end
+      @states << [@state_thresholds[-1], nil]
       
-      state_count = 
+      # Now that states have been determined, call parent
+      # class to finish processing training data.
+      super
     end
 end
