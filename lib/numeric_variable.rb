@@ -73,4 +73,5 @@ class Sbn
       # class to finish processing training data.
       super
     end
+  end
 end
