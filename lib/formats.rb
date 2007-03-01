@@ -35,7 +35,22 @@ class Sbn
           @variables.each do |name, variable|
             xml.variable(:type => "nature") do
               xml.name(name.to_s)
-              variable.states.each {|s| xml.outcome(s.to_s) }
+              if variable.class == NumericVariable
+                variable.states.each do |s|
+                  str = ""
+                  str += "gt#{s.first}" if s.first
+                  str += "_" unless str.empty?                  
+                  str += "lt#{s[1]}" if s[1]
+                  xml.outcome(str)
+                end
+              else
+                variable.states.each {|s| xml.outcome(s.to_s) }                
+              end
+              xml.property("SbnVariableType = #{variable.class.to_s}")
+              if variable.class == StringVariable
+                covars = variable.covariables.map {|covar| covar.name }
+                xml.property("Covariables = #{covars.join(',')}")
+              end
             end
           end
           xml.text! "\n"

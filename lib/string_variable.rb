@@ -18,6 +18,8 @@ class Sbn
   end
   
   class StringVariable < Variable
+    attr_reader :covariables
+    
     def initialize(net, name = '')
       @net = net
       @covariables = {}
