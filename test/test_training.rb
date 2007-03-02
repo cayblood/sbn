@@ -1,7 +1,7 @@
 require 'test/unit'
 require File.dirname(__FILE__) + '/../lib/sbn4r'
 
-class TestTraining < Test::Unit::TestCase       # :nodoc: all
+class TestTraining < Test::Unit::TestCase # :nodoc:
   def setup
     @net = Sbn::Net.new("Categorization")
     @category = Sbn::Variable.new(@net, :category, [0.33, 0.33, 0.33], [:food, :groceries, :gas])
@@ -12,7 +12,7 @@ class TestTraining < Test::Unit::TestCase       # :nodoc: all
   def teardown
   end
 
-  def test_training
+  def test_train
     @net.train([
       {:category => :food, :text => 'foo'},
       {:category => :food, :text => 'gro'},
@@ -34,5 +34,9 @@ class TestTraining < Test::Unit::TestCase       # :nodoc: all
     assert_in_delta food_prob, 0.333, 0.001
     assert_in_delta groceries_prob, 0.333, 0.001
     assert_in_delta gas_prob, 0.333, 0.001
+  end
+  
+  def test_set_probabilities_from_evidence
+    raise NotImplementedError, 'Need to write test_set_probabilities_from_evidence'
   end
 end

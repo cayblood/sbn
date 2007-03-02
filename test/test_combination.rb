@@ -1,7 +1,7 @@
 require 'test/unit'
 require File.dirname(__FILE__) + '/../lib/sbn4r'
 
-class TestCombination < Test::Unit::TestCase
+class TestCombination < Test::Unit::TestCase # :nodoc:
   def test_current
     raise NotImplementedError, 'Need to write test_current'
   end

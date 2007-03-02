@@ -1,5 +1,5 @@
 # used for defining enumerated constants
-class Object
+class Object # :nodoc:
   def self.enums(*args)    
     args.flatten.each_with_index do |const, i|
       class_eval %(#{const} = #{i})
@@ -13,7 +13,7 @@ class Object
   end
 end
 
-class String
+class String # :nodoc:
   def to_underscore_sym
     self.titleize.gsub(/\s+/, '').underscore.to_sym
   end
@@ -29,13 +29,13 @@ class String
   end
 end
 
-class Symbol
+class Symbol # :nodoc:
   def to_underscore_sym
     self.to_s.titleize.gsub(/\s+/, '').underscore.to_sym
   end
 end
 
-class Array
+class Array # :nodoc:
   def symbolize_values
     self.map {|e| e.to_underscore_sym }
   end
@@ -55,7 +55,7 @@ class Array
   end
 end
 
-class Hash
+class Hash # :nodoc:
   def symbolize_keys_and_values
     inject({}) do |options, (key, value)|
       key = key.to_underscore_sym
@@ -75,7 +75,7 @@ class Hash
   end
 end
 
-module Enumerable
+module Enumerable # :nodoc:
   ##
   # Sum of all the elements of the Enumerable
   def sum

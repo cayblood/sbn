@@ -13,7 +13,7 @@
 # [2, 7]
 # [2, 8]
 
-class Combination
+class Combination # :nodoc:
   include Enumerable
   
   def initialize(arr)
