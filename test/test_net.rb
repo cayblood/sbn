@@ -23,7 +23,7 @@ class TestNet < Test::Unit::TestCase
     probs = @net.query_variable(:grass_wet)
     assert_in_delta(probs[:true], 0.9, 0.1)
     assert_in_delta(probs[:false], 0.1, 0.1)
-    
+
     probs = @net.query_variable(:cloudy)
     assert_in_delta(probs[:true], 0.8780487804878049, 0.1)
     assert_in_delta(probs[:false], 0.12195121951219512, 0.1)

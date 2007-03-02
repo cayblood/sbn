@@ -51,7 +51,7 @@ class Sbn
       return if variable == self or @children.include?(variable)
       variable.add_parent_no_recurse(self)
       unless variable.is_a?(StringVariable)
-        @children << variable unless
+        @children << variable
         variable.generate_probability_table
       end
     end
@@ -95,7 +95,7 @@ class Sbn
     end
     
     def set_in_evidence?(evidence)
-      evidence.has_key?(evidence_name) ? true : false
+      evidence.has_key?(evidence_name)
     end
     
     def get_observed_state(evidence)
