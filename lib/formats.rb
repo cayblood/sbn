@@ -32,36 +32,10 @@ class Sbn
           xml.name(@name.to_s)
           xml.text! "\n"
           xml.comment! "Variables"
-          @variables.each do |name, variable|
-            xml.variable(:type => "nature") do
-              xml.name(name.to_s)
-              if variable.class == NumericVariable
-                variable.states.each do |s|
-                  str = ""
-                  str += "gt#{s.first}" if s.first
-                  str += "_" unless str.empty?                  
-                  str += "lt#{s[1]}" if s[1]
-                  xml.outcome(str)
-                end
-              else
-                variable.states.each {|s| xml.outcome(s.to_s) }                
-              end
-              xml.property("SbnVariableType = #{variable.class.to_s}")
-              if variable.class == StringVariable
-                covars = variable.covariables.map {|covar| covar.name }
-                xml.property("Covariables = #{covars.join(',')}")
-              end
-            end
-          end
+          @variables.each {|name, variable| variable.to_xmlbif_variable(xml) }
           xml.text! "\n"
           xml.comment! "Probability distributions"
-          @variables.each do |name, variable|
-            xml.definition do
-              xml.for(name.to_s)
-              variable.parents.each {|parent| xml.given(parent.name.to_s) }
-              xml.table(variable.probability_table.transpose.last.join(' '))
-            end
-          end
+          @variables.each {|name, variable| variable.to_xmlbif_definition(xml) }
         end
       end
     end
@@ -77,26 +51,67 @@ class Sbn
       returnval = Net.new(netname)
       
       # find variables
+      count = 0
       variables = {}
       variable_elements = doc['network'].first['variable'].each do |var|
-        varname = var['name'].first
+        varname = var['name'].first.to_sym
+        properties = var['property']
+        vartype = nil
+        manager_name = nil
+        text_to_match = ""
+        options = {}
+        thresholds = []
+        properties.each do |prop|
+          key, val = prop.split('=').map {|e| e.strip }
+          vartype = val if key == 'SbnVariableType'
+          manager_name = val if key == 'ManagerVariableName'
+          text_to_match = val if key == 'TextToMatch'
+          options[key.to_sym] = val.to_i if key =~ /stdev_state_count/
+          thresholds = val.map {|e| e.to_f } if key == 'StateThresholds'
+        end
         states = var['outcome']
-        table = nil
+        table = []
         doc['network'].first['definition'].each do |defn|
-          if defn['for'].first == varname
+          if defn['for'].first.to_sym == varname
             table = defn['table'].first.split.map {|prob| prob.to_f }
           end
         end
-        variables[varname] = Variable.new(varname, table, states)
+        count += 1
+        variables[varname] = case vartype
+          when "Sbn::StringVariable" then StringVariable.new(returnval, varname)
+          when "Sbn::NumericVariable" then NumericVariable.new(returnval, varname, table, thresholds, options)
+          when "Sbn::Variable" then Variable.new(returnval, varname, table, states)
+          when "Sbn::StringCovariable" then StringCovariable.new(returnval, manager_name, text_to_match, table)
+        end
       end
 
       # find relationships between variables
-      doc['network'].first['definition'].each do |defn|
-        varname = defn['for'].first
-        parents = defn['given']
-        parents.each {|p| variables[varname].add_parent(variables[p]) } if parents
+
+      # connect covariables to their managers
+      variable_elements = doc['network'].first['variable'].each do |var|
+        varname = var['name'].first.to_sym
+        properties = var['property']
+        vartype = nil
+        covars = nil
+        parents = nil
+        properties.each do |prop|
+          key, val = prop.split('=').map {|e| e.strip }
+          covars = val.split(',').map {|e| e.strip.to_sym } if key == 'Covariables'
+          parents = val.split(',').map {|e| e.strip.to_sym } if key == 'Parents'
+          vartype = val if key == 'SbnVariableType'
+        end
+        if vartype == "Sbn::StringVariable"
+          parents.each {|p| variables[varname].add_parent(variables[p]) } if parents
+          covars.each {|covar| variables[varname].add_covariable(variables[covar]) } if covars
+        end
       end
-      returnval << variables.values
+
+      # connect all other variables to their parents
+      doc['network'].first['definition'].each do |defn|
+        varname = defn['for'].first.to_sym
+        parents = defn['given']
+        parents.each {|p| variables[varname].add_parent(variables[p.to_sym]) } if parents
+      end
       returnval
     end
   end

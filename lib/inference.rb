@@ -16,6 +16,7 @@ class Sbn
       state_frequencies = {}
       e = generate_random_event
       relevant_evidence = e.reject {|key, val| @variables[key].set_in_evidence?(@evidence) }
+
       MCMC_NUM_SAMPLES.times do
         state = e[varname]
         state_frequencies[state] ||= 0
