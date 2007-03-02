@@ -1,7 +1,7 @@
 require 'test/unit'
 require File.dirname(__FILE__) + '/../lib/sbn4r'
 
-class TestHelper < Test::Unit::TestCase
+class TestHelpers < Test::Unit::TestCase
   def test_ngrams
     assert_equal "THIS IS A STRING".ngrams(2), ["TH", "HI", "IS", "S ", " I", "IS", "S ", " A", "A ", " S", "ST", "TR", "RI", "IN", "NG"]
     assert_equal "THIS IS A STRING".ngrams(3), ["THI", "HIS", "IS ", "S I", " IS", "IS ", "S A", " A ", "A S", " ST", "STR", "TRI", "RIN", "ING"]
