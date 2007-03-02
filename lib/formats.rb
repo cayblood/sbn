@@ -1,7 +1,7 @@
 class Sbn
   class Net
     # converts net to XMLBIF format
-    # (http://www.cs.cmu.edu/afs/cs/user/fgcozman/www/Research/InterchangeFormat/)
+    # http://www.cs.cmu.edu/afs/cs/user/fgcozman/www/Research/InterchangeFormat
     def to_xmlbif
       xml = Builder::XmlMarkup.new(:indent => 2)
       xml.instruct!
