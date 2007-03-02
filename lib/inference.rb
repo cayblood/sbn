@@ -1,6 +1,6 @@
 class Sbn
   class Net
-    MCMC_NUM_SAMPLES = 2000
+    MCMC_DEFAULT_SAMPLE_COUNT = 2000
 
   	# Returns a hash containing the estimated posterior probability of each
     # possible state for the specified variable, based on previously-supplied
@@ -19,7 +19,7 @@ class Sbn
       e = generate_random_event
       relevant_evidence = e.reject {|key, val| @variables[key].set_in_evidence?(@evidence) }
 
-      MCMC_NUM_SAMPLES.times do
+      MCMC_DEFAULT_SAMPLE_COUNT.times do
         state = e[varname]
         state_frequencies[state] ||= 0
         state_frequencies[state] += 1
