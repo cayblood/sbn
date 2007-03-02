@@ -1,14 +1,13 @@
 require 'test/unit'
 require File.dirname(__FILE__) + '/../lib/sbn4r'
 
-class NetTest < Test::Unit::TestCase
+class TestNet < Test::Unit::TestCase
   def setup
     @net       = Sbn::Net.new("Grass Wetness Belief Net")
-    @cloudy    = Sbn::Variable.new(:cloudy, [0.5, 0.5])
-    @sprinkler = Sbn::Variable.new(:sprinkler, [0.1, 0.9, 0.5, 0.5])
-    @rain      = Sbn::Variable.new(:rain, [0.8, 0.2, 0.2, 0.8])
-    @grass_wet = Sbn::Variable.new(:grass_wet, [0.99, 0.01, 0.9, 0.1, 0.9, 0.1, 0.0, 1.0])
-    @net << [@cloudy, @sprinkler, @rain, @grass_wet]
+    @cloudy    = Sbn::Variable.new(@net, :cloudy, [0.5, 0.5])
+    @sprinkler = Sbn::Variable.new(@net, :sprinkler, [0.1, 0.9, 0.5, 0.5])
+    @rain      = Sbn::Variable.new(@net, :rain, [0.8, 0.2, 0.2, 0.8])
+    @grass_wet = Sbn::Variable.new(@net, :grass_wet, [0.99, 0.01, 0.9, 0.1, 0.9, 0.1, 0.0, 1.0])
     @cloudy.add_child(@sprinkler)
     @cloudy.add_child(@rain)
     @sprinkler.add_child(@grass_wet)
@@ -31,6 +30,11 @@ class NetTest < Test::Unit::TestCase
     
     @evidence = {}
     @net.set_evidence(@evidence)
+ 
+    probs = @net.query_variable(:cloudy)
+    assert_in_delta(probs[:true], 0.5, 0.1)
+    assert_in_delta(probs[:false], 0.5, 0.1)
+ 
     probs = @net.query_variable(:sprinkler)
     assert_in_delta(probs[:true], 0.3, 0.1)
     assert_in_delta(probs[:false], 0.7, 0.1)

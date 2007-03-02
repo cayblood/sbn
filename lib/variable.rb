@@ -14,10 +14,33 @@ class Sbn
       @state_frequencies = {} # used for storing training data
       set_states(states)
       set_probabilities(probabilities)
+      net.add_variable(self)
     end
     
+    def ==(obj); test_equal(obj); end
+    def eql?(obj); test_equal(obj); end
+    def ===(obj); test_equal(obj); end
+
     def to_s
       @name.to_s
+    end
+    
+    def to_xmlbif_variable(xml)
+      xml.variable(:type => "nature") do
+        xml.name(@name.to_s)
+        @states.each {|s| xml.outcome(s.to_s) }
+        xml.property("SbnVariableType = #{self.class.to_s}")
+        yield(xml) if block_given?
+      end
+    end
+    
+    def to_xmlbif_definition(xml)
+      xml.definition do
+        xml.for(@name.to_s)
+        @parents.each {|p| xml.given(p.name.to_s) }
+        xml.table(@probability_table.transpose.last.join(' '))
+        yield(xml) if block_given?
+      end
     end
     
     def evidence_name
@@ -25,25 +48,31 @@ class Sbn
     end
     
     def add_child(variable)
-      return if variable == self
-      @children << variable
+      return if variable == self or @children.include?(variable)
       variable.add_parent_no_recurse(self)
-      variable.generate_probability_table
+      unless variable.is_a?(StringVariable)
+        @children << variable unless
+        variable.generate_probability_table
+      end
     end
     
     def add_child_no_recurse(variable)
-      @children << variable
+      return if variable == self or @children.include?(variable)
+      @children << variable unless variable.is_a?(StringVariable)
     end
     
     def add_parent(variable)
-      return if variable == self
-      @parents << variable
+      return if variable == self or @parents.include?(variable)
       variable.add_child_no_recurse(self)
-      generate_probability_table
+      unless variable.is_a?(StringVariable)
+        @parents << variable
+        generate_probability_table
+      end
     end
     
     def add_parent_no_recurse(variable)
-      @parents << variable
+      return if variable == self or @parents.include?(variable)
+      @parents << variable unless variable.is_a?(StringVariable)
     end
     
     def set_states(states)
@@ -86,14 +115,14 @@ class Sbn
   	# between zero and one and iterate through the states until the 
   	# cumulative sum of their probabilities exceeds our random number.    
     def get_random_state(event = {})
-      event = @net.symbolize_evidence(event)
+#      event = @net.symbolize_evidence(event)
       seek_state {|s| evaluate_marginal(s, event) }
     end
     
   	# similar to get_random_state() except it evaluates a variable's markov
   	# blanket in addition to the variable itself.
     def get_random_state_with_markov_blanket(event)
-      event = @net.symbolize_evidence(event)
+#      event = @net.symbolize_evidence(event)
       evaluations = []
       @states.each {|s| evaluations << evaluate_markov_blanket(s, event) }
       evaluations.normalize!
@@ -157,6 +186,24 @@ class Sbn
       returnval *= evaluate_marginal(state, event)
       @children.each {|child| returnval *= child.evaluate_marginal(child.get_observed_state(event), event) }
       event[@name] = temp
+      returnval
+    end
+
+    def test_equal(variable)
+      returnval = true
+      returnval = false unless variable.class == self.class and self.is_a? Variable
+      returnval = false unless returnval and @name == variable.name
+      if returnval
+        parent_names = []
+        variable.parents.each {|p| parent_names << p.name.to_s }
+        my_parent_names = []
+        @parents.each {|p| my_parent_names << p.name.to_s }
+        returnval = false unless parent_names.sort == my_parent_names.sort
+        returnval = false unless @states == variable.states
+        table = variable.probability_table.transpose.last
+        my_table = @probability_table.transpose.last
+        returnval = false unless table == my_table
+      end
       returnval
     end
   end
