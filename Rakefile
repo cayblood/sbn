@@ -5,3 +5,7 @@ task :default => :test
 task :test do
   exec "ruby test/sbn4r.rb"
 end
+
+task :doc do
+  exec "rdoc"
+end
