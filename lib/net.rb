@@ -1,6 +1,4 @@
 class Sbn
-  MCMC_NUM_SAMPLES = 2000
-  
   class Net
     attr_reader :name, :variables
     

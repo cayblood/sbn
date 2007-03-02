@@ -7,5 +7,5 @@ task :test do
 end
 
 task :doc do
-  exec "rdoc"
+  exec "rdoc --quiet --main Sbn --exclude test*"
 end

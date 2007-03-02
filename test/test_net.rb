@@ -1,7 +1,7 @@
 require 'test/unit'
 require File.dirname(__FILE__) + '/../lib/sbn4r'
 
-class TestNet < Test::Unit::TestCase
+class TestNet < Test::Unit::TestCase       # :nodoc: all
   def setup
     @net       = Sbn::Net.new("Grass Wetness Belief Net")
     @cloudy    = Sbn::Variable.new(@net, :cloudy, [0.5, 0.5])

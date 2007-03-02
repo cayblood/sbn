@@ -1,5 +1,7 @@
 class Sbn
   class Net
+    MCMC_NUM_SAMPLES = 2000
+
   	# Returns a hash containing the estimated posterior probability of each
     # possible state for the specified variable, based on previously-supplied
     # evidence, using the Markov Chain Monte Carlo algorithm. The MCMC algorithm
