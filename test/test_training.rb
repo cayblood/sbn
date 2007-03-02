@@ -1,7 +1,7 @@
 require 'test/unit'
 require File.dirname(__FILE__) + '/../lib/sbn4r'
 
-class TrainingTest < Test::Unit::TestCase
+class TestTraining < Test::Unit::TestCase
   def setup
     @net = Sbn::Net.new("Categorization")
     @category = Sbn::Variable.new(@net, :category, [0.33, 0.33, 0.33], [:food, :groceries, :gas])
