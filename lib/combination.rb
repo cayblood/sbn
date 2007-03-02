@@ -1,4 +1,4 @@
-# takes an array of arrays and iterates over all combinations of subelements.
+# takes an array of arrays and iterates over all combinations of sub-elements.
 # For example:
 # 
 # c = Combination.new([[1, 2], [6, 7, 8]])
