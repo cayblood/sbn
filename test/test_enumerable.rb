@@ -1,7 +1,7 @@
 require 'test/unit'
 require File.dirname(__FILE__) + '/../lib/sbn4r'
 
-class TestEnumerable < Test::Unit::TestCase
+class TestEnumerable < Test::Unit::TestCase       # :nodoc: all
   def test_sum
     assert_equal 45, (1..9).sum
   end

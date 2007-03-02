@@ -1,7 +1,7 @@
 require 'test/unit' unless defined? $ZENTEST and $ZENTEST
 require File.dirname(__FILE__) + '/../lib/sbn4r'
 
-class TestVariable < Test::Unit::TestCase
+class TestVariable < Test::Unit::TestCase       # :nodoc: all
   def setup
     @net = Sbn::Net.new
   end

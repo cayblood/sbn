@@ -1,7 +1,7 @@
 require 'test/unit'
 require File.dirname(__FILE__) + '/../lib/sbn4r'
 
-class TestCombination < Test::Unit::TestCase
+class TestCombination < Test::Unit::TestCase       # :nodoc: all
   def setup
     @c = Combination.new([[:bear, :badger], [:stork, :bluegill, :beetle], [:fig, :grape]])
   end
