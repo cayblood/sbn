@@ -1,20 +1,28 @@
 require 'test/unit'
 require File.dirname(__FILE__) + '/../lib/sbn4r'
 
-class TestCombination < Test::Unit::TestCase       # :nodoc: all
-  def setup
-    @c = Combination.new([[:bear, :badger], [:stork, :bluegill, :beetle], [:fig, :grape]])
+class TestCombination < Test::Unit::TestCase
+  def test_current
+    raise NotImplementedError, 'Need to write test_current'
   end
-  
-  def teardown
-  end
-  
+
   def test_each
-    assert true
+    raise NotImplementedError, 'Need to write test_each'
   end
-  
-  def test_comparison
-    c1 = Combination.new([[1, 2], [3, 4, 5]])
-    assert true
+
+  def test_first
+    raise NotImplementedError, 'Need to write test_first'
+  end
+
+  def test_last
+    raise NotImplementedError, 'Need to write test_last'
+  end
+
+  def test_next_combination
+    raise NotImplementedError, 'Need to write test_next_combination'
+  end
+
+  def test_prev_combination
+    raise NotImplementedError, 'Need to write test_prev_combination'
   end
 end
