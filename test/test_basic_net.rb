@@ -116,10 +116,10 @@ class TestBasicNet < Test::Unit::TestCase # :nodoc:
     # should not be able to set covariables directly
     assert_raise(RuntimeError) { net.set_evidence({:string_var_covar_tes => :true}) }
     
-    net.set_evidence 'basic_var' => 'true', 'string_var' => "TesT", 'num_var' => 3
+    net.set_evidence 'BASIC VAR' => 'true', 'string_var' => "TesT", 'num_var' => 3
     evidence = net.instance_variable_get('@evidence')
     assert evidence.has_key?(:basic_var)
-    assert !evidence.has_key?('basic_var')
+    assert !evidence.has_key?('BASIC VAR')
     assert evidence[:basic_var].is_a?(Symbol)
     assert_equal evidence[:basic_var], :true
     
