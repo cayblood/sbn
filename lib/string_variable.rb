@@ -19,6 +19,10 @@ class Sbn
     def get_observed_state(evidence)
       evidence[@manager_name].include?(@text_to_match) ? :true : :false
     end
+    
+    def transform_evidence_value(val)
+      raise "Evidence should not be provided for string covariables"
+    end
 
   private
     def test_equal(covariable)
@@ -127,10 +131,13 @@ class Sbn
           @covariable_parents.each {|p| newcovar.add_parent(p) }
           @covariable_children.each {|p| newcovar.add_child(p) }
           @covariables[ng] = newcovar
-          @net.add_variable(newcovar)
         end
         @covariables[ng].add_training_set(evidence)
       end
+    end
+    
+    def transform_evidence_value(val)
+      val.to_s.downcase
     end
     
   private

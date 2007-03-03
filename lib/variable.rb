@@ -143,6 +143,10 @@ class Sbn
       sum
     end
     
+    def transform_evidence_value(val)
+      val.to_sym
+    end
+    
   private
     def seek_state
       sum = 0.0

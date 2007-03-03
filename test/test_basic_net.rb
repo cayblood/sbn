@@ -1,7 +1,7 @@
 require 'test/unit'
 require File.dirname(__FILE__) + '/../lib/sbn4r'
 
-class TestNet < Test::Unit::TestCase # :nodoc:
+class TestBasicNet < Test::Unit::TestCase # :nodoc:
   def setup
     @net       = Sbn::Net.new("Grass Wetness Belief Net")
     @cloudy    = Sbn::Variable.new(@net, :cloudy, [0.5, 0.5])
@@ -15,7 +15,12 @@ class TestNet < Test::Unit::TestCase # :nodoc:
     @evidence = {:sprinkler => :false, :rain => :true}
   end
   
-  def teardown
+  def generate_simple_network
+    net = Sbn::Net.new("Test")
+    var1 = Sbn::Variable.new(net, :var1)
+    var2 = Sbn::Variable.new(net, :var2, [0.25, 0.75, 0.75, 0.25])
+    var2.add_parent(var1)
+    net
   end
   
   def test_inference_on_grasswet_with_evidence_querying_grasswet
@@ -33,32 +38,28 @@ class TestNet < Test::Unit::TestCase # :nodoc:
   end
 
   def test_inference_on_grasswet_without_evidence_querying_cloudy
-    @evidence = {}
-    @net.set_evidence @evidence
+    @net.set_evidence({})
     probs = @net.query_variable(:cloudy)
     assert_in_delta(probs[:true], 0.5, 0.1)
     assert_in_delta(probs[:false], 0.5, 0.1)
   end
 
   def test_inference_on_grasswet_without_evidence_querying_sprinkler
-    @evidence = {}
-    @net.set_evidence @evidence
+    @net.set_evidence({})
     probs = @net.query_variable(:sprinkler)
     assert_in_delta(probs[:true], 0.3, 0.1)
     assert_in_delta(probs[:false], 0.7, 0.1)
   end
 
   def test_inference_on_grasswet_without_evidence_querying_rain
-    @evidence = {}
-    @net.set_evidence @evidence
+    @net.set_evidence({})
     probs = @net.query_variable(:rain)
     assert_in_delta(probs[:true], 0.5, 0.1)
     assert_in_delta(probs[:false], 0.5, 0.1)
   end
 
   def test_inference_on_grasswet_without_evidence_querying_grasswet
-    @evidence = {}
-    @net.set_evidence @evidence
+    @net.set_evidence({})
     probs = @net.query_variable(:grass_wet)
     assert_in_delta(probs[:true], 0.6471, 0.1)
     assert_in_delta(probs[:false], 0.3529, 0.1)
@@ -68,28 +69,68 @@ class TestNet < Test::Unit::TestCase # :nodoc:
     output = @net.to_xmlbif
     newnet = Sbn::Net.from_xmlbif(output)
     assert_equal @net, newnet
-    
-    # test other network types
-    raise NotImplementedError, 'Need to write more tests for import/export'
   end
   
   def test_equality
-    raise NotImplementedError, 'Need to write test_equality'
+    net1 = generate_simple_network
+    net2 = generate_simple_network
+    net3 = Sbn::Net.new('Another Net')
+    assert_equal net1, net2
+    assert_not_equal net1, net3
   end
   
   def test_add_variable
-    raise NotImplementedError, 'Need to write test_add_variable'
+    net = generate_simple_network
+    assert net.instance_variable_get('@variables').has_key?(:var1)
+    assert net.instance_variable_get('@variables').has_key?(:var2)
   end
   
   def test_query_variable
-    raise NotImplementedError, 'Need to write test_query_variable'
+    net = generate_simple_network
+    net.set_evidence :var1 => :true
+    probs = net.query_variable(:var2)
+    assert probs.has_key?(:true)
+    assert probs.has_key?(:false)
+    assert_in_delta(probs[:true], 0.25, 0.1)
+    assert_in_delta(probs[:false], 0.75, 0.1)
   end
   
   def test_set_evidence
-    raise NotImplementedError, 'Need to write test_set_evidence'
+    net = generate_simple_network
+    net.set_evidence :var2 => :false
+    variables = net.instance_variable_get('@variables')
+    evidence = net.instance_variable_get('@evidence')
+    assert variables[:var2].set_in_evidence?(evidence)
+    assert !variables[:var1].set_in_evidence?(evidence)
   end
   
   def test_symbolize_evidence
-    raise NotImplementedError, 'Need to write test_symbolize_evidence'
+    # Create a network with each kind of variable and make sure evidence
+    # transformation works.
+    net = Sbn::Net.new("Test")
+    basic_var = Sbn::Variable.new(net, :basic_var)
+    string_var = Sbn::StringVariable.new(net, :string_var)
+    num_var = Sbn::NumericVariable.new(net, :num_var, [0.5, 0.5], [1.0])
+    string_var.add_training_set({:basic_var => :true, :string_var => "test", :num_var => 1.5})
+    
+    # should not be able to set covariables directly
+    assert_raise(RuntimeError) { net.set_evidence({:string_var_covar_tes => :true}) }
+    
+    net.set_evidence 'basic_var' => 'true', 'string_var' => "TesT", 'num_var' => 3
+    evidence = net.instance_variable_get('@evidence')
+    assert evidence.has_key?(:basic_var)
+    assert !evidence.has_key?('basic_var')
+    assert evidence[:basic_var].is_a?(Symbol)
+    assert_equal evidence[:basic_var], :true
+    
+    assert evidence.has_key?(:string_var)
+    assert !evidence.has_key?('string_var')
+    assert evidence[:string_var].is_a?(String)
+    assert_equal evidence[:string_var], evidence[:string_var].downcase
+    
+    assert evidence.has_key?(:num_var)
+    assert !evidence.has_key?('num_var')
+    assert evidence[:num_var].is_a?(Float)
+    assert_equal evidence[:num_var], 3.0
   end
 end
