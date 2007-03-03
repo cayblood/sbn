@@ -26,13 +26,7 @@ class Sbn
       newevidence = {}
       evidence.each do |key, val|
         key = key.to_sym
-        if @variables[key].is_a?(StringVariable)
-          newevidence[key] = val.downcase
-        elsif @variables[key].is_a?(NumericVariable)
-          newevidence[key] = val.to_f
-        else
-          newevidence[key] = val.to_sym
-        end
+        newevidence[key] = @variables[key].transform_evidence_value(val)
       end
       newevidence
     end

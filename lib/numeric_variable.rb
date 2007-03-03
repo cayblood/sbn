@@ -68,6 +68,10 @@ class Sbn
       super
     end
     
+    def transform_evidence_value(val)
+      val.to_f
+    end
+    
   private
     def generate_states_from_thresholds
       returnval = []
