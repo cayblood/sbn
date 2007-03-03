@@ -25,7 +25,7 @@ class Sbn
     def symbolize_evidence(evidence)
       newevidence = {}
       evidence.each do |key, val|
-        key = key.to_sym
+        key = key.to_underscore_sym
         newevidence[key] = @variables[key].transform_evidence_value(val)
       end
       newevidence

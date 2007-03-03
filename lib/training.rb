@@ -5,6 +5,7 @@ class Sbn
     def is_complete_evidence?(evidence)
       varnames = [evidence_name.to_s]
       @parents.each {|p| varnames << p.name.to_s }
+      yield(varnames) if block_given?
       
       # ignore covariables when determining whether evidence is complete or not
       varnames.map! do |n|
@@ -33,6 +34,7 @@ class Sbn
     end
 
     def set_probabilities_from_training_data
+      return unless @training_data
       accumulate_state_frequencies
       sum = 0.0
       @state_frequencies.values.each {|val| sum += val.to_f }

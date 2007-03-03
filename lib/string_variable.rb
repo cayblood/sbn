@@ -23,6 +23,10 @@ class Sbn
     def transform_evidence_value(val)
       raise "Evidence should not be provided for string covariables"
     end
+    
+    def set_in_evidence?(evidence)
+      evidence.has_key?(@manager_name)
+    end
 
   private
     def test_equal(covariable)
@@ -110,6 +114,11 @@ class Sbn
     
     def generate_probability_table
       @covariables.each {|ng, covar| covar.generate_probability_table }
+    end
+    
+    def is_complete_evidence?(evidence)
+      parent_names = @covariable_parents.map {|p| p.name.to_s }
+      super(evidence) {|varnames| varnames.concat(parent_names) }
     end
     
     # create co-variables when new n-grams are encountered
