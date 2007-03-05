@@ -144,7 +144,7 @@ class Sbn
     end
     
     def transform_evidence_value(val)
-      val.to_underscore_sym
+      val.to_underscore_sym       
     end
     
   private
