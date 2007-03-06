@@ -318,34 +318,52 @@ class TestStringVariable < Test::Unit::TestCase # :nodoc:
     assert @text.covariables.include?(covar)
   end
 
-=begin
   def test_add_parent_no_recurse
-    raise NotImplementedError, 'Need to write test_add_parent_no_recurse'
+    covariable_parents = @text.instance_variable_get('@covariable_parents')
+    newvar = Sbn::Variable.new(@net, :newvar)
+    assert !covariable_parents.include?(newvar)
+    @text.add_parent(newvar)
+    covariable_parents = @text.instance_variable_get('@covariable_parents')
+    assert covariable_parents.include?(newvar)
   end
 
   def test_add_training_set
-    raise NotImplementedError, 'Need to write test_add_training_set'
+    # make sure covariables are created with each training set
+    assert_equal 3, @text.covariables.size
+    @text.add_training_set({:text => "newtext", :category => :gas})
+    assert_equal 11, @text.covariables.size
   end
 
   def test_covariables
-    raise NotImplementedError, 'Need to write test_covariables'
-  end
-
-  def test_generate_probability_table
-    raise NotImplementedError, 'Need to write test_generate_probability_table'
+    assert_not_nil @text.covariables
   end
 
   def test_set_in_evidence_eh
-    raise NotImplementedError, 'Need to write test_set_in_evidence_eh'
+    assert_raise(RuntimeError) { @text.set_in_evidence?({:text => "newtext", :category => :gas}) } 
   end
 
   def test_to_xmlbif_definition
-    raise NotImplementedError, 'Need to write test_to_xmlbif_definition'
+    xml = Builder::XmlMarkup.new(:indent => 2)
+    assert_nil @text.to_xmlbif_definition(xml)
   end
 
   def test_to_xmlbif_variable
-    raise NotImplementedError, 'Need to write test_to_xmlbif_variable'
+    xml = Builder::XmlMarkup.new(:indent => 2)
+    expected_output = <<-EOS
+    <variable type="nature">
+      <name>text</name>
+      <property>SbnVariableType = Sbn::StringVariable</property>
+      <property>Covariables = foo,gas,gro</property>
+      <property>Parents = category</property>
+    </variable>
+    EOS
+    assert_equal expected_output.gsub(/\s+/, ''), @text.to_xmlbif_variable(xml).gsub(/\s+/, '')
   end
   
-=end  
+  def test_is_complete_evidence_eh
+    evidence = {}
+    assert !@text.is_complete_evidence?(evidence)    
+    evidence = {:category => :food, :text => "foo"}
+    assert @text.is_complete_evidence?(evidence)
+  end
 end

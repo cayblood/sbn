@@ -2,6 +2,8 @@ require File.dirname(__FILE__) + '/variable'
 
 class Sbn
   class StringCovariable < Variable
+    attr_reader :text_to_match
+    
     def initialize(net, manager_name, text_to_match, probabilities)
       @manager_name = manager_name
       @text_to_match = text_to_match.downcase
@@ -53,9 +55,8 @@ class Sbn
     
     # returns an array of the variable's string covariables in alphabetical order
     def covariables
-      keys = @covariables.keys.map {|key| key.to_s }
       returnval = []
-      keys.sort.each {|key| returnval << @covariables[key.to_sym] }
+      @covariables.keys.sort.each {|key| returnval << @covariables[key] }
       returnval
     end
     
@@ -87,7 +88,7 @@ class Sbn
     def add_covariable(covariable)
       @covariable_children.each {|child| covariable.add_child(child) }
       @covariable_parents.each {|parent| covariable.add_parent(parent) }
-      @covariables[covariable.name] = covariable
+      @covariables[covariable.text_to_match] = covariable
     end
     
     # This node never has any parents or children.  It just
@@ -134,7 +135,7 @@ class Sbn
       # Make ngrams as small as 3 characters in length up to
       # the length of the string.  We may need to whittle this
       # down significantly to avoid severe computational burdens.
-      (3..len).each {|n| ngrams.concat val.ngrams(n) }
+      [3, 5, 10].each {|n| ngrams.concat val.ngrams(n) }
       ngrams.uniq!
       ngrams.each do |ng|
         unless @covariables.has_key?(ng)

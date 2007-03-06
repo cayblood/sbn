@@ -70,15 +70,10 @@ class Sbn
     def add_parent_no_recurse(variable)
       return if variable == self or @parents.include?(variable)
       if variable.is_a?(StringVariable)
-        p "covariables =================================="
-        p variable.covariables
-        variable.covariables.each {|c| p c.name}
-        p "----------------------------------------------"
         @parents.concat variable.covariables
       else
         @parents << variable
       end
-      @parents.each {|p| p p.name }
       generate_probability_table
     end
     
