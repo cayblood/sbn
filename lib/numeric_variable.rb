@@ -18,7 +18,7 @@ class Sbn
     end
     
     def to_xmlbif_variable(xml)
-      super(xml) {|x| x.property("StateThresholds = #{variable.state_thresholds.join(',')}") }
+      super(xml) {|x| x.property("StateThresholds = #{@state_thresholds.join(',')}") }
     end
     
     def get_observed_state(evidence)
@@ -43,6 +43,7 @@ class Sbn
       increment_amount_for_first_stdev = stdev * 2.0 / @state_count_one.to_f
       increment_amount_for_second_stdev = stdev * 2.0 / @state_count_two.to_f
       current_position = average - (stdev * 2.0)
+      @state_thresholds = []
       
       # start on the left, two standard deviations away from the average
       (@state_count_two / 2).times do
