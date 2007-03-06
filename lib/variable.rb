@@ -48,31 +48,38 @@ class Sbn
     end
     
     def add_child(variable)
-      return if variable == self or @children.include?(variable)
+      add_child_no_recurse(variable)
       variable.add_parent_no_recurse(self)
-      unless variable.is_a?(StringVariable)
-        @children << variable
-        variable.generate_probability_table
-      end
     end
     
     def add_child_no_recurse(variable)
       return if variable == self or @children.include?(variable)
-      @children << variable unless variable.is_a?(StringVariable)
+      if variable.is_a?(StringVariable)
+        @children.concat variable.covariables
+      else
+        @children << variable
+      end
+      variable.generate_probability_table
     end
     
     def add_parent(variable)
-      return if variable == self or @parents.include?(variable)
+      add_parent_no_recurse(variable)
       variable.add_child_no_recurse(self)
-      unless variable.is_a?(StringVariable)
-        @parents << variable
-        generate_probability_table
-      end
     end
     
     def add_parent_no_recurse(variable)
       return if variable == self or @parents.include?(variable)
-      @parents << variable unless variable.is_a?(StringVariable)
+      if variable.is_a?(StringVariable)
+        p "covariables =================================="
+        p variable.covariables
+        variable.covariables.each {|c| p c.name}
+        p "----------------------------------------------"
+        @parents.concat variable.covariables
+      else
+        @parents << variable
+      end
+      @parents.each {|p| p p.name }
+      generate_probability_table
     end
     
     def set_states(states)
@@ -83,8 +90,13 @@ class Sbn
     
     def set_probability(probability, event)
       event = @net.symbolize_evidence(event)
-      c = [event[@name]]
-      index = state_combinations.index(c)
+      unless can_be_evaluated?(event)
+        raise "A valid state was not supplied for variable #{@name} and all its parents in call to set_probability()"
+      end
+      combination_for_this_event = []
+      @parents.each {|p| combination_for_this_event << event[p.name] }
+      combination_for_this_event << event[@name]
+      index = state_combinations.index(combination_for_this_event)
       @probabilities[index] = probability
       generate_probability_table
     end
@@ -115,14 +127,12 @@ class Sbn
   	# between zero and one and iterate through the states until the 
   	# cumulative sum of their probabilities exceeds our random number.    
     def get_random_state(event = {})
-#      event = @net.symbolize_evidence(event)
       seek_state {|s| evaluate_marginal(s, event) }
     end
     
   	# similar to get_random_state() except it evaluates a variable's markov
   	# blanket in addition to the variable itself.
     def get_random_state_with_markov_blanket(event)
-#      event = @net.symbolize_evidence(event)
       evaluations = []
       @states.each {|s| evaluations << evaluate_markov_blanket(s, event) }
       evaluations.normalize!
@@ -130,9 +140,12 @@ class Sbn
     end
 
     def generate_probability_table
-      return unless @probabilities
-      probs = @probabilities.dup
-      @probability_table = state_combinations.collect {|e| [e, probs.shift] }
+      @probab
+      @probability_table = nil
+      if @probabilities and @probabilities.size == state_combinations.size
+        probs = @probabilities.dup
+        @probability_table = state_combinations.collect {|e| [e, probs.shift] }
+      end
     end
 
     def evaluate_marginal(state, event)
@@ -195,6 +208,8 @@ class Sbn
 
     def test_equal(variable)
       returnval = true
+      net_name = variable.instance_eval('@net.name')
+      returnval = false unless @net.name == net_name
       returnval = false unless variable.class == self.class and self.is_a? Variable
       returnval = false unless returnval and @name == variable.name
       if returnval

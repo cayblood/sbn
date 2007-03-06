@@ -9,7 +9,10 @@ class Sbn
     end
     
     def to_xmlbif_variable(xml)
-      super(xml) {|x| x.property("ManagerVariableName = #{variable.manager_name.to_s}") }
+      super(xml) do |x|
+        x.property("ManagerVariableName = #{@manager_name.to_s}")
+        x.property("TextToMatch = #{@text_to_match.inspect}")
+      end
     end
     
     def evidence_name
@@ -40,8 +43,6 @@ class Sbn
   end
   
   class StringVariable < Variable
-    attr_reader :covariables
-    
     def initialize(net, name = '')
       @net = net
       @covariables = {}
@@ -50,9 +51,17 @@ class Sbn
       super(net, name, [], [])
     end
     
+    # returns an array of the variable's string covariables in alphabetical order
+    def covariables
+      keys = @covariables.keys.map {|key| key.to_s }
+      returnval = []
+      keys.sort.each {|key| returnval << @covariables[key.to_sym] }
+      returnval
+    end
+    
     def to_xmlbif_variable(xml)
       super(xml) do |x|
-        covars = @covariables.map {|covar| covar.name }
+        covars = @covariables.keys.sort
         parents = @covariable_parents.map {|p| p.name }
         x.property("Covariables = #{covars.join(',')}") unless covars.empty?
 
@@ -71,45 +80,40 @@ class Sbn
     # always appear to be set in the evidence so that it won't
     # waste time in the inference process.
     def set_in_evidence?(evidence)
-      true
+      raise "String variables should never be used in inference--only their covariables"
     end
     
     # This method is used when reconstituting saved networks
     def add_covariable(covariable)
       @covariable_children.each {|child| covariable.add_child(child) }
-      @covariable_parents.each {|parent| covariable.add_child(parent) }
+      @covariable_parents.each {|parent| covariable.add_parent(parent) }
       @covariables[covariable.name] = covariable
-      covariable.manager_name = @name
     end
     
     # This node never has any parents or children.  It just
     # sets the parents or children of its covariables.
-    def add_child(variable)
-      return if variable == self
-      @covariable_children << variable
-      @covariables.each do |ng, covar|
-        covar.add_child(variable)
-        variable.add_parent_no_recurse(covar)
-      end
-    end
-    
     def add_child_no_recurse(variable)
-      @covariable_children << variable
-      @covariables.each {|ng, covar| covar.add_child_no_recurse(variable) }
-    end
-    
-    def add_parent(variable)
-      return if variable == self
-      @covariable_parents << variable
-      @covariables.each do |ng, covar|
-        covar.add_parent(variable)
-        variable.add_child_no_recurse(covar)
+      return if variable == self or @covariable_children.include?(variable)
+      if variable.is_a?(StringVariable)
+        @covariable_children.concat variable.covariables
+        @covariables.each {|ng, covar| variable.covariables.each {|varcovar| covar.add_child(varcovar) } }
+      else
+        @covariable_children << variable
+        @covariables.each {|ng, covar| covar.add_child(variable) }
       end
+      variable.generate_probability_table
     end
     
     def add_parent_no_recurse(variable)
-      @covariable_parents << variable
-      @covariables.each {|ng, covar| covar.add_parent_no_recurse(variable) }
+      return if variable == self or @covariable_parents.include?(variable)
+      if variable.is_a?(StringVariable)
+        @covariable_parents.concat variable.covariables
+        @covariables.each {|ng, covar| variable.covariables.each {|varcovar| covar.add_parent(varcovar) } }
+      else
+        @covariable_parents << variable
+        @covariables.each {|ng, covar| covar.add_parent(variable) }
+      end
+      generate_probability_table
     end
     
     def generate_probability_table
