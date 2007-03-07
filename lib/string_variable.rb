@@ -1,7 +1,7 @@
 require File.dirname(__FILE__) + '/variable'
 
 class Sbn
-  class StringCovariable < Variable
+  class StringCovariable < Variable # :nodoc:
     attr_reader :text_to_match
     
     def initialize(net, manager_name, text_to_match, probabilities)
