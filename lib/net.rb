@@ -8,9 +8,10 @@
 # space.
 #
 # A Bayesian Network is a directed acyclic graph representing the variables
-# in a problem space and the probabilities of these variables' possible
-# states.  It is also the algorithms used to calculate the most likely 
-# state of unobserved variables in the problem space. 
+# in a problem space, the causal relationships between these variables, and
+# the probabilities of these variables' possible states.  It is also the
+# algorithms used to calculate the most likely state of unobserved
+# variables in the problem space. 
 # 
 # == Example
 # Our sample network has four variables:
