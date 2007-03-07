@@ -1,5 +1,5 @@
-require 'test/unit' unless defined? $ZENTEST and $ZENTEST
-require File.dirname(__FILE__) + '/../lib/sbn4r'
+require 'test/unit'
+require File.dirname(__FILE__) + '/../lib/sbn'
 
 class TestVariable < Test::Unit::TestCase # :nodoc:
   def setup
