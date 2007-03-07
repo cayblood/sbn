@@ -1,4 +1,29 @@
-# used for defining enumerated constants
+# = helpers.rb: Helper methods added to existing Ruby classes
+# Credit goes to ruby-talk posts for many of these (details below).
+#
+# Permission is hereby granted, free of charge, to any person
+# obtaining a copy of this software and associated documentation
+# files (the "Software"), to deal in the Software without
+# restriction, including without limitation the rights to use,
+# copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the
+# Software is furnished to do so, subject to the following
+# conditions:
+# 
+# The above copyright notice and this permission notice shall be
+# included in all copies or substantial portions of the Software.
+# 
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+# EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+# OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+# NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+# HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+# WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+# FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+# OTHER DEALINGS IN THE SOFTWARE.
+
+# Thanks to Brian Schrer <ruby.brian _at_ gmail.com> for the
+# following two methods, from ruby-talk post #150456.
 class Object # :nodoc:
   def self.enums(*args)    
     args.flatten.each_with_index do |const, i|
@@ -18,6 +43,8 @@ class String # :nodoc:
     self.titleize.gsub(/\s+/, '').underscore.to_sym
   end
 
+  # Thanks to David Alan Black for this method, from
+  # ruby-talk post #11792
   def ngrams(len = 1)
     ngrams = []
     (0..size - len).each do |n|
@@ -75,6 +102,8 @@ class Hash # :nodoc:
   end
 end
 
+# Thanks to Eric Hodel for the following additions
+# to the enumerable model, from ruby-talk post #135920.
 module Enumerable # :nodoc:
   ##
   # Sum of all the elements of the Enumerable
