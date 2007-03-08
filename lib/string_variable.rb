@@ -17,19 +17,19 @@ class Sbn
       end
     end
     
-    def evidence_name
+    def evidence_name # :nodoc:
       @manager_name
     end
     
-    def get_observed_state(evidence)
+    def get_observed_state(evidence) # :nodoc:
       evidence[@manager_name].include?(@text_to_match) ? :true : :false
     end
     
-    def transform_evidence_value(val)
+    def transform_evidence_value(val) # :nodoc:
       raise "Evidence should not be provided for string covariables"
     end
     
-    def set_in_evidence?(evidence)
+    def set_in_evidence?(evidence) # :nodoc:
       evidence.has_key?(@manager_name)
     end
 
@@ -52,80 +52,7 @@ class Sbn
       @covariable_parents = []
       super(net, name, [], [])
     end
-    
-    # returns an array of the variable's string covariables in alphabetical order
-    def covariables
-      returnval = []
-      @covariables.keys.sort.each {|key| returnval << @covariables[key] }
-      returnval
-    end
-    
-    def to_xmlbif_variable(xml)
-      super(xml) do |x|
-        covars = @covariables.keys.sort
-        parents = @covariable_parents.map {|p| p.name }
-        x.property("Covariables = #{covars.join(',')}") unless covars.empty?
 
-        # A string variable's parents cannot be specified in the "given"
-        # section below, because only its covariables actually have them.
-        x.property("Parents = #{parents.join(',')}") unless parents.empty?
-      end
-    end
-    
-    def to_xmlbif_definition(xml)
-      # string variables do not have any direct probabilities--only their covariables
-    end
-    
-    # This node never influences the probabilities.  Its sole
-    # responsibility is to manage the co-variables, so it should
-    # always appear to be set in the evidence so that it won't
-    # waste time in the inference process.
-    def set_in_evidence?(evidence)
-      raise "String variables should never be used in inference--only their covariables"
-    end
-    
-    # This method is used when reconstituting saved networks
-    def add_covariable(covariable)
-      @covariable_children.each {|child| covariable.add_child(child) }
-      @covariable_parents.each {|parent| covariable.add_parent(parent) }
-      @covariables[covariable.text_to_match] = covariable
-    end
-    
-    # This node never has any parents or children.  It just
-    # sets the parents or children of its covariables.
-    def add_child_no_recurse(variable)
-      return if variable == self or @covariable_children.include?(variable)
-      if variable.is_a?(StringVariable)
-        @covariable_children.concat variable.covariables
-        @covariables.each {|ng, covar| variable.covariables.each {|varcovar| covar.add_child(varcovar) } }
-      else
-        @covariable_children << variable
-        @covariables.each {|ng, covar| covar.add_child(variable) }
-      end
-      variable.generate_probability_table
-    end
-    
-    def add_parent_no_recurse(variable)
-      return if variable == self or @covariable_parents.include?(variable)
-      if variable.is_a?(StringVariable)
-        @covariable_parents.concat variable.covariables
-        @covariables.each {|ng, covar| variable.covariables.each {|varcovar| covar.add_parent(varcovar) } }
-      else
-        @covariable_parents << variable
-        @covariables.each {|ng, covar| covar.add_parent(variable) }
-      end
-      generate_probability_table
-    end
-    
-    def generate_probability_table
-      @covariables.each {|ng, covar| covar.generate_probability_table }
-    end
-    
-    def is_complete_evidence?(evidence)
-      parent_names = @covariable_parents.map {|p| p.name.to_s }
-      super(evidence) {|varnames| varnames.concat(parent_names) }
-    end
-    
     # create co-variables when new n-grams are encountered
     def add_training_set(evidence)
       val = evidence[@name].downcase.strip
@@ -150,7 +77,80 @@ class Sbn
       end
     end
     
-    def transform_evidence_value(val)
+    # returns an array of the variable's string covariables in alphabetical order
+    def covariables # :nodoc:
+      returnval = []
+      @covariables.keys.sort.each {|key| returnval << @covariables[key] }
+      returnval
+    end
+    
+    def to_xmlbif_variable(xml) # :nodoc:
+      super(xml) do |x|
+        covars = @covariables.keys.sort
+        parents = @covariable_parents.map {|p| p.name }
+        x.property("Covariables = #{covars.join(',')}") unless covars.empty?
+
+        # A string variable's parents cannot be specified in the "given"
+        # section below, because only its covariables actually have them.
+        x.property("Parents = #{parents.join(',')}") unless parents.empty?
+      end
+    end
+    
+    def to_xmlbif_definition(xml) # :nodoc:
+      # string variables do not have any direct probabilities--only their covariables
+    end
+    
+    # This node never influences the probabilities.  Its sole
+    # responsibility is to manage the co-variables, so it should
+    # always appear to be set in the evidence so that it won't
+    # waste time in the inference process.
+    def set_in_evidence?(evidence) # :nodoc:
+      raise "String variables should never be used in inference--only their covariables"
+    end
+    
+    # This method is used when reconstituting saved networks
+    def add_covariable(covariable) # :nodoc:
+      @covariable_children.each {|child| covariable.add_child(child) }
+      @covariable_parents.each {|parent| covariable.add_parent(parent) }
+      @covariables[covariable.text_to_match] = covariable
+    end
+    
+    # This node never has any parents or children.  It just
+    # sets the parents or children of its covariables.
+    def add_child_no_recurse(variable) # :nodoc:
+      return if variable == self or @covariable_children.include?(variable)
+      if variable.is_a?(StringVariable)
+        @covariable_children.concat variable.covariables
+        @covariables.each {|ng, covar| variable.covariables.each {|varcovar| covar.add_child(varcovar) } }
+      else
+        @covariable_children << variable
+        @covariables.each {|ng, covar| covar.add_child(variable) }
+      end
+      variable.generate_probability_table
+    end
+    
+    def add_parent_no_recurse(variable) # :nodoc:
+      return if variable == self or @covariable_parents.include?(variable)
+      if variable.is_a?(StringVariable)
+        @covariable_parents.concat variable.covariables
+        @covariables.each {|ng, covar| variable.covariables.each {|varcovar| covar.add_parent(varcovar) } }
+      else
+        @covariable_parents << variable
+        @covariables.each {|ng, covar| covar.add_parent(variable) }
+      end
+      generate_probability_table
+    end
+    
+    def generate_probability_table # :nodoc:
+      @covariables.each {|ng, covar| covar.generate_probability_table }
+    end
+    
+    def is_complete_evidence?(evidence) # :nodoc:
+      parent_names = @covariable_parents.map {|p| p.name.to_s }
+      super(evidence) {|varnames| varnames.concat(parent_names) }
+    end
+    
+    def transform_evidence_value(val) # :nodoc:
       val.to_s.downcase
     end
     
