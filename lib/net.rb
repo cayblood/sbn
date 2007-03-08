@@ -191,8 +191,8 @@
 # inference.
 #
 # === Sbn::StringVariable
-# Sbn::StringVariable is used for handling string data.  Rather than setting this
-# type of variable's states manually, rely on the training
+# Sbn::StringVariable is used for handling string data.  Rather than setting a
+# StringVariable's states manually, rely on the training
 # process.  During training, you should pass the observed string for this variable
 # for each training set.  Each observed string is divided into a series of n-grams
 # (short character sequences) matching snippets of the observed string.  A new
