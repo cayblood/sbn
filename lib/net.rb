@@ -221,7 +221,7 @@
 # data in your domain.  This variable type makes it much easier to work with numeric
 # data by dynamically adapting to your data and handling the discretization for you.
 #
-# == Potential Future Improvements
+# == Potential Improvements
 #
 
 class Sbn
