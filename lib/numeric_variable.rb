@@ -16,23 +16,6 @@ class Sbn
       states = generate_states_from_thresholds
       super(net, name, probabilities, states)
     end
-    
-    def to_xmlbif_variable(xml)
-      super(xml) {|x| x.property("StateThresholds = #{@state_thresholds.join(',')}") }
-    end
-    
-    def get_observed_state(evidence)
-      num = evidence[@name]
-      thresholds = @state_thresholds.dup
-      index = 0
-      t = thresholds.shift
-      while num >= t and !thresholds.empty? do
-        t = thresholds.shift
-        index += 1
-      end
-      index += 1 if num >= t and thresholds.empty?
-      @states[index]
-    end
 
     # alter the state table based on the variance of the training data
     def set_probabilities_from_training_data
@@ -69,7 +52,24 @@ class Sbn
       super
     end
     
-    def transform_evidence_value(val)
+    def to_xmlbif_variable(xml) # :nodoc:
+      super(xml) {|x| x.property("StateThresholds = #{@state_thresholds.join(',')}") }
+    end
+    
+    def get_observed_state(evidence) # :nodoc:
+      num = evidence[@name]
+      thresholds = @state_thresholds.dup
+      index = 0
+      t = thresholds.shift
+      while num >= t and !thresholds.empty? do
+        t = thresholds.shift
+        index += 1
+      end
+      index += 1 if num >= t and thresholds.empty?
+      @states[index]
+    end
+
+    def transform_evidence_value(val) # :nodoc:
       val.to_f
     end
     

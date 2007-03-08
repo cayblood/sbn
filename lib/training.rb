@@ -2,7 +2,7 @@ class Sbn
   class Variable
     NEGLIGIBLE_PROBABILITY = 0.0001
     
-    def is_complete_evidence?(evidence)
+    def is_complete_evidence?(evidence) # :nodoc:
       varnames = [evidence_name.to_s]
       @parents.each {|p| varnames << p.name.to_s }
       yield(varnames) if block_given?

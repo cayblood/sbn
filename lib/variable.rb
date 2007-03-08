@@ -42,41 +42,7 @@ class Sbn
         yield(xml) if block_given?
       end
     end
-    
-    def evidence_name
-      @name
-    end
-    
-    def add_child(variable)
-      add_child_no_recurse(variable)
-      variable.add_parent_no_recurse(self)
-    end
-    
-    def add_child_no_recurse(variable)
-      return if variable == self or @children.include?(variable)
-      if variable.is_a?(StringVariable)
-        @children.concat variable.covariables
-      else
-        @children << variable
-      end
-      variable.generate_probability_table
-    end
-    
-    def add_parent(variable)
-      add_parent_no_recurse(variable)
-      variable.add_child_no_recurse(self)
-    end
-    
-    def add_parent_no_recurse(variable)
-      return if variable == self or @parents.include?(variable)
-      if variable.is_a?(StringVariable)
-        @parents.concat variable.covariables
-      else
-        @parents << variable
-      end
-      generate_probability_table
-    end
-    
+
     def set_states(states)
       states.symbolize_values!
       @states = states
@@ -95,23 +61,57 @@ class Sbn
       @probabilities[index] = probability
       generate_probability_table
     end
+
+    def add_child(variable)
+      add_child_no_recurse(variable)
+      variable.add_parent_no_recurse(self)
+    end
+
+    def add_parent(variable)
+      add_parent_no_recurse(variable)
+      variable.add_child_no_recurse(self)
+    end
     
     def set_probabilities(probs)
       @probabilities = probs
       generate_probability_table
     end
     
-    def set_in_evidence?(evidence)
+    def evidence_name # :nodoc:
+      @name
+    end
+    
+    def add_child_no_recurse(variable) # :nodoc:
+      return if variable == self or @children.include?(variable)
+      if variable.is_a?(StringVariable)
+        @children.concat variable.covariables
+      else
+        @children << variable
+      end
+      variable.generate_probability_table
+    end
+    
+    def add_parent_no_recurse(variable) # :nodoc:
+      return if variable == self or @parents.include?(variable)
+      if variable.is_a?(StringVariable)
+        @parents.concat variable.covariables
+      else
+        @parents << variable
+      end
+      generate_probability_table
+    end
+    
+    def set_in_evidence?(evidence) # :nodoc:
       evidence.has_key?(evidence_name)
     end
     
-    def get_observed_state(evidence)
+    def get_observed_state(evidence) # :nodoc:
       evidence[@name]
     end
 
   	# A variable can't be evaluated unless its parents have
   	# been observed    
-    def can_be_evaluated?(evidence)
+    def can_be_evaluated?(evidence) # :nodoc:
       returnval = true
       parents.each {|p| returnval = false unless p.set_in_evidence?(evidence) }
       returnval
@@ -121,20 +121,20 @@ class Sbn
   	# just pick a random state.  Instead we generate a random number
   	# between zero and one and iterate through the states until the 
   	# cumulative sum of their probabilities exceeds our random number.    
-    def get_random_state(event = {})
+    def get_random_state(event = {}) # :nodoc:
       seek_state {|s| evaluate_marginal(s, event) }
     end
     
   	# similar to get_random_state() except it evaluates a variable's markov
   	# blanket in addition to the variable itself.
-    def get_random_state_with_markov_blanket(event)
+    def get_random_state_with_markov_blanket(event) # :nodoc:
       evaluations = []
       @states.each {|s| evaluations << evaluate_markov_blanket(s, event) }
       evaluations.normalize!
       seek_state {|s| evaluations.shift }
     end
 
-    def generate_probability_table
+    def generate_probability_table # :nodoc:
       @probab
       @probability_table = nil
       if @probabilities and @probabilities.size == state_combinations.size
@@ -143,7 +143,7 @@ class Sbn
       end
     end
 
-    def evaluate_marginal(state, event)
+    def evaluate_marginal(state, event) # :nodoc:
       temp_probs = @probability_table.dup
       remove_irrelevant_states(temp_probs, state, event)
       sum = 0.0
@@ -151,7 +151,7 @@ class Sbn
       sum
     end
     
-    def transform_evidence_value(val)
+    def transform_evidence_value(val) # :nodoc:
       val.to_underscore_sym       
     end
     

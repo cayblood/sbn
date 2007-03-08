@@ -8,30 +8,147 @@
 # space.
 #
 # A Bayesian Network is a directed acyclic graph representing the variables
-# in a problem space, the causal relationships between these variables, and
-# the probabilities of these variables' possible states.  It is also the
-# algorithms used to calculate the most likely state of unobserved
-# variables in the problem space. 
+# in a problem space, the causal relationships between these variables and
+# the marginal probabilities of these variables' possible states, as well
+# as the algorithms used for inference on these variables. 
 # 
-# == Example
-# Our sample network has four variables:
-# * Cloudy: :true if sky is cloudy, :false if sky is sunny.
-# * Sprinkler: :true if sprinklers were turned on, :false if not
-# * Rain: :true if it rained, :false if not
-# * GrassWet: :true if the grass is wet, :false if not
+# == A Basic Example
+# link://../images/grass_wetness.png
+#
+# We'll begin with a network whose probabilities are pre-defined. This
+# example comes from the excellent <em>Artificial Intelligence: A Modern
+# Approach</em>, by Russell & Norvig.  Later we'll see how to determine a
+# network's probabilities from training data.  Our sample network has four
+# variables, each of which has two possible states:
+# * <em>Cloudy</em>: <b>:true</b> if sky is cloudy, <b>:false</b> if sky is sunny.
+# * <em>Sprinkler</em>: <b>:true</b> if sprinkler was turned on, <b>:false</b> if not. Whether or not it's cloudy has a direct influence on whether or not the sprinkler is turned on, so there is a parent-child relationship between <em>Sprinkler</em> and <em>Cloudy</em>.
+# * <em>Rain</em>: <b>:true</b> if it rained, <b>:false</b> if not. Whether or not it's cloudy has a direct influence on whether or not it will rain, so there is a relationship there too.
+# * <em>Grass Wet</em>: <b>:true</b> if the grass is wet, <b>:false</b> if not. The state of the grass is directly influenced by both rain and the sprinkler, but cloudiness has no direct influence on the state of the grass, so grass has a relationship with both <em>Sprinkler</em> and <em>Rain</em> but not <em>Cloudy</em>.
+#
+# Each variable holds a state table representing the conditional probabilties
+# of each of its own states given each of its parents' states.  <em>Cloudy</em>
+# has no parents, so it only has probabilities for its own two states.
+# <em>Sprinkler</em> and <em>Rain</em> each have one parent, so they must
+# specify probabilities for all four possible combinations of their own
+# states and their parents' states.  Since <em>Grass Wet</em> has two
+# parents, it must specify all eight possible combinations of states.
+# Since we live in a logical universe, each variable's possible states
+# given a specific combination of its parents' states must add up to 1.0.
+# Notice that <em>Cloudy</em>'s probabilities add up to 1.0, <em>Sprinkler</em>'s states 
+# given <em>Cloudy</em> == :true add up to 1.0 and so on.
+#
+#  require 'sbn'
 #
 #  net       = Sbn::Net.new("Grass Wetness Belief Net")
 #  cloudy    = Sbn::Variable.new(net, :cloudy, [0.5, 0.5])
 #  sprinkler = Sbn::Variable.new(net, :sprinkler, [0.1, 0.9, 0.5, 0.5])
 #  rain      = Sbn::Variable.new(net, :rain, [0.8, 0.2, 0.2, 0.8])
 #  grass_wet = Sbn::Variable.new(net, :grass_wet, [0.99, 0.01, 0.9, 0.1, 0.9, 0.1, 0.0, 1.0])
-#  cloudy.add_child(sprinkler)
+#  cloudy.add_child(sprinkler)        # also creates parent relationship 
 #  cloudy.add_child(rain)
 #  sprinkler.add_child(grass_wet)
 #  rain.add_child(grass_wet)
 #  evidence = {:sprinkler => :false, :rain => :true}
+#  net.set_evidence(evidence)
 #  net.query_variable(:grass_wet)
-
+#
+#  => {:true=>0.8995, :false=>0.1005} # inferred probabilities for grass_wet
+#                                     # given sprinkler == :false and rain == :true
+#
+# === Specifying probabilities
+#
+# The order that probabilities are supplied is as follows.  Always
+# alternate between the states of the variable whose probabilties you are
+# supplying.  Supply the probabilities of these states given the variable's
+# parents in the order the parents were added, from right to left, with the
+# rightmost (most recently added) parent alternating first.  For example,
+# if I have one variable A with two parents B and C, A having three states, B
+# having two, and C having four, I would supply the probabilities in
+# the following order:
+#  
+#  P(A1|B1,C1)   # this notation means "The probability of A1 given B1 and C1"
+#  P(A2|B1,C1)
+#  P(A3|B1,C1)
+#  
+#  P(A1|B1,C2)
+#  P(A2|B1,C2)
+#  P(A3|B1,C2)
+#
+#  P(A1|B1,C3)
+#  P(A2|B1,C3)
+#  P(A3|B1,C3)
+#
+#  P(A1|B1,C4)
+#  P(A2|B1,C4)
+#  P(A3|B1,C4)
+#
+#  P(A1|B2,C1)
+#  P(A2|B2,C1)
+#  P(A3|B2,C1)
+#
+#  P(A1|B2,C2)
+#  P(A2|B2,C2)
+#  P(A3|B2,C2)
+#
+#  P(A1|B2,C3)
+#  P(A2|B2,C3)
+#  P(A3|B2,C3)
+#
+#  P(A1|B2,C4)
+#  P(A2|B2,C4)
+#  P(A3|B2,C4)
+#
+# A more verbose, but possibly less confusing way of specifying probabilities
+# is to set the specific probability for each state separately using a hash
+# to represent the combination of states:
+#
+#  net = Sbn::Net.new("Grass Wetness Belief Net")
+#  cloudy    = Sbn::Variable.new(net, :cloudy)      # states default to :true and :false
+#  sprinkler = Sbn::Variable.new(net, :sprinkler)
+#  rain      = Sbn::Variable.new(net, :rain)
+#  grass_wet = Sbn::Variable.new(net, :grass_wet)
+#  cloudy.add_child(sprinkler)
+#  cloudy.add_child(rain)
+#  sprinkler.add_child(grass_wet)
+#  rain.add_child(grass_wet)
+#  cloudy.set_probability(0.5, {:cloudy => :true})
+#  cloudy.set_probability(0.5, {:cloudy => :false})
+#  sprinkler.set_probability(0.1, {:sprinkler => :true, :cloudy => :true})
+#  sprinkler.set_probability(0.9, {:sprinkler => :false, :cloudy => :true})
+#  sprinkler.set_probability(0.5, {:sprinkler => :true, :cloudy => :false})
+#  sprinkler.set_probability(0.5, {:sprinkler => :false, :cloudy => :false})
+#  # etc etc
+#
+# === Inference
+#
+# After your network is set up, you can set evidence for specific variables
+# that you have observed and then query unknown variables to see the posterior
+# probability of their various states.  Given these inferred probabilties, one
+# common decision-making strategy is to assume that the variables are set to
+# their most probable states.
+#
+#  evidence = {:sprinkler => :false, :rain => :true}
+#  net.set_evidence(evidence)
+#  net.query_variable(:grass_wet)
+#
+#  => {:true=>0.8995, :false=>0.1005} # inferred probabilities for grass_wet
+#                                     # given sprinkler == :false and rain == :true
+#
+# The only currently supported inference algorithm is the Markov Chain Monte Carlo
+# (MCMC) algorithm.  This is an approximation algorithm.  Given the complexity of
+# inference in Bayesian networks (NP-hard[http://en.wikipedia.org/wiki/NP-hard]),
+# exact inference is often infeasible. The
+# MCMC algorithm approximates the posterior probability for each variable's state by
+# generating a random set of states for the unset variables in proportion to each
+# state's posterior probability.  It generates successive random states conditioned
+# on the previous values of the non-evidence variables.  The reason this works is
+# because over time, the amount of time spent in each
+# random state is proportional to its posterior probabilty.
+#
+# == Training a Bayesian Network
+#
+# Although it is sometimes useful to specify a variable's probabilities in advance,
+# it is more likely
 class Sbn
   class Net
     attr_reader :name, :variables
@@ -56,7 +173,7 @@ class Sbn
       @variables[name] = variable
     end
     
-    def symbolize_evidence(evidence)
+    def symbolize_evidence(evidence) # :nodoc:
       newevidence = {}
       evidence.each do |key, val|
         key = key.to_underscore_sym
