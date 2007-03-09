@@ -11,6 +11,11 @@
 # probabilities of these variables' possible states, as well as the algorithms used
 # for inference on these variables.
 # 
+# == Installation
+# Installation of SBN is simple:
+#
+#  # gem install sbn
+#
 # == A Basic Example
 # link://../images/grass_wetness.png
 # 
@@ -184,9 +189,7 @@
 # for serializing Bayesian networks:
 #  
 #  FILENAME = 'grass_wetness.xml'
-#  File.open(FILENAME, 'w') do |f|
-#    f.write(net.to_xmlbif)
-#  end
+#  File.open(FILENAME, 'w') {|f| f.write(net.to_xmlbif) }
 #  reconstituted_net = net.from_xmlbif(File.read(FILENAME))
 #
 # At present, training data is not saved with your network, but this feature is
@@ -209,7 +212,7 @@
 # and are transparent to you, the developer.  They inherit the same parents and
 # children as their managing StringVariable.  By dividing observed string data
 # into fine-grained substrings and determining separate probabilities for each substring
-# occurrence, an extremely accurate picture of the data can be developed.
+# occurrence, an extremely accurate understanding of the data can be developed.
 #
 # === Sbn::NumericVariable
 # Sbn::NumericVariable is used for handling numeric data, which is continuous
@@ -224,12 +227,55 @@
 # and all numbers between 3.5 and 6 might be classified in another.  The thresholds
 # for each state are based on the mean and standard deviation of the observed
 # data, and are recalculated every time training occurs, so even though some amount
-# of accuracy is lost by discretization, the states chosen are well-adapted to the
-# data in your domain.  This variable type makes it much easier to work with numeric
-# data by dynamically adapting to your data and handling the discretization for you.
+# of accuracy is lost by discretization, the states chosen should usually be well-adapted
+# to the data in your domain (assuming it is somewhat normally distributed).  This variable
+# type makes it much easier to work with numeric data by dynamically adapting to your
+# data and handling the discretization for you.
 #
-# == Potential Improvements
+# The following example shows a network that uses these advanced variable types:
 #
+#  net = Sbn::Net('Budget Category Network')
+#  category = Sbn::Variable(net, :category, [0.5, 0.25, 0.25], [:gas, :food, :clothing])
+#  amount = Sbn::NumericVariable(net, :amount)
+#  merchant = Sbn::StringVariable(net, :merchant)
+#  category.add_child(amount)
+#  category.add_child(merchant)
+#
+# Before training this network, it looks like this:
+#
+# link://../images/stringvar1.png
+#
+# The <em>Category</em> variable represents a budget category for a financial transaction.
+# The <em>Amount</em> variable is for the amount of the transaction and the
+# <em>Merchant</em> variable handles observed strings for the merchant where the
+# transaction took place.  Suppose we supplied some training data to this network:
+#
+#  net.add_training_set :category => :gas, :amount => 29.11, :merchant => 'Chevron'
+#
+# After adding that training set, the network would look something like this:
+#
+# link://../images/stringvar2.png
+#
+# The variables with dashed edges are the string covariables that were created by
+# the managing string variable when it saw a new string in the training data.  At
+# present, string variables generate ngrams of length 3, 6, and 10
+# characters.  It is anticipated that these lengths will become customizable in
+# a future release.
+#
+# == Future Features
+# There are many areas where we hope to improve Simple Bayesian Networks.  Here are
+# some of the possible improvements that may be added in future releases:
+# * Support for exact inference
+# * Support for continuous variables
+# * Saving the training data along with the network when saving to XMLBIF
+# * More efficient in-memory storage of training data (currently a copy of each training set is kept in each variable)
+# * Speedier inference using native C++ with vectorization provided by macstl[http://www.pixelglow.com/macstl/]
+# * Speedier inference through parallelization
+# * Support for inference of variable relationships from training data
+# * Support for customizing the number of iterations in the MCMC algorithm (currently hard-coded)
+# * Support for intelligently determining the best number of iterations for MCMC at runtime based on the desired level of precision
+#
+# Please share your own ideas with us and help to improve this library.
 
 class Sbn
   class Net

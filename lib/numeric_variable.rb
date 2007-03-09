@@ -18,7 +18,7 @@ class Sbn
     end
 
     # alter the state table based on the variance of the training data
-    def set_probabilities_from_training_data!
+    def set_probabilities_from_training_data! # :nodoc:
       values = []
       @training_data.each {|evidence| values << evidence[@name] }
       stdev = values.standard_deviation
