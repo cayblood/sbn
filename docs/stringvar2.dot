@@ -1,0 +1,25 @@
+digraph untitled
+	{
+	  category[label="Category"];
+		amount[label="Amount\n(NumericVariable)"];
+		merchant[label="Merchant\n(StringVariable)"];
+		covar1[label="merchant_covar_che",style="dashed"]
+		covar2[label="merchant_covar_hev",style="dashed"]
+		covar3[label="merchant_covar_evr",style="dashed"]
+		covar4[label="merchant_covar_vro",style="dashed"]
+		covar5[label="merchant_covar_ron",style="dashed"]
+		covar6[label="merchant_covar_chevro",style="dashed"]
+		covar7[label="merchant_covar_hevron",style="dashed"]
+		covar8[label="merchant_covar_chevron",style="dashed"]
+		
+		category -> amount;
+		category -> merchant;
+		category -> covar1[style="dashed"];
+		category -> covar2[style="dashed"];
+		category -> covar3[style="dashed"];
+		category -> covar4[style="dashed"];
+		category -> covar5[style="dashed"];
+		category -> covar6[style="dashed"];
+		category -> covar7[style="dashed"];
+		category -> covar8[style="dashed"];
+	}
