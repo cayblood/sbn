@@ -33,7 +33,7 @@ class Sbn
       @training_data << evidence
     end
 
-    def set_probabilities_from_training_data
+    def set_probabilities_from_training_data!
       return unless @training_data
       accumulate_state_frequencies
       sum = 0.0
@@ -78,7 +78,7 @@ class Sbn
     # based on the data.
     def train(data)
       data.each {|evidence| add_training_set(evidence) }
-      set_probabilities_from_training_data
+      set_probabilities_from_training_data!
     end
     
     def add_training_set(evidence)
@@ -86,8 +86,8 @@ class Sbn
       @variables.each {|key, val| val.add_training_set(evidence) }
     end
     
-    def set_probabilities_from_training_data
-      @variables.each {|key, val| val.set_probabilities_from_training_data }      
+    def set_probabilities_from_training_data!
+      @variables.each {|key, val| val.set_probabilities_from_training_data! }
     end
   end
 end

@@ -223,7 +223,7 @@ class TestNumericVariable < Test::Unit::TestCase # :nodoc:
     @var1.add_training_set({:var1 => temp_data.shift})
     @var1.add_training_set({:var1 => temp_data.shift})
     @var1.add_training_set({:var1 => temp_data.shift})
-    @var1.set_probabilities_from_training_data
+    @var1.set_probabilities_from_training_data!
     assert_equal @var1.state_thresholds.shift, data.average - (data.standard_deviation * 2.0)
   end
 

@@ -164,9 +164,16 @@
 #    {:cloudy => :false, :sprinkler => :false, :rain => :false, :grass_wet => :false},
 #  ])
 #
+# Training data can also be specified one set at a time and calculation of the
+# probability tables can be deferred until a specific time:
+#
+#  net.add_training_set({:cloudy => :true, :sprinkler => :false, :rain => :true, :grass_wet => :true})
+#  net.add_training_set({:cloudy => :true, :sprinkler => :true, :rain => :false, :grass_wet => :true})
+#  net.set_probabilities_from_training_data!
+#
 # Networks store the training data you have given them, so that future training
 # continues to take previous data into account. The training process is
-# straightforward. The frequency of each state combination in each variable is
+# fairly simple. The frequency of each state combination in each variable is
 # determined, and the number of occurrences for each state combination are divided
 # by the total number of combinations trained on.
 # 
@@ -187,11 +194,11 @@
 #
 # == Advanced Variable Types
 # Among SBN's most powerful features are its advanced variable types, which make it
-# much more convenient to handle real-world data, and increase the accuracy of your
-# inference.
+# much more convenient to handle real-world data and increase the relevancy of your
+# results.
 #
 # === Sbn::StringVariable
-# Sbn::StringVariable is used for handling string data.  Rather than setting a
+# Sbn::StringVariable is used for handling string data.  Rather than set a
 # StringVariable's states manually, rely on the training
 # process.  During training, you should pass the observed string for this variable
 # for each training set.  Each observed string is divided into a series of n-grams
