@@ -1,9 +1,0 @@
-digraph untitled
-	{
-	  category[label="Category"]
-		amount[label="Amount\n(NumericVariable)"];
-		merchant[label="Merchant\n(StringVariable)"]
-		
-		category -> amount;
-		category -> merchant;
-	}
