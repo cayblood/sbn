@@ -1,6 +1,3 @@
-# = formats.rb: Methods for saving and loading Bayesian networks
-# Copyright (C) 2005-2007  Carl Youngblood mailto:carl@youngbloods.org
-
 class Sbn
   class Net
     # Returns a string containing a representation of the network in XMLBIF format.
