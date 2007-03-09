@@ -43,7 +43,7 @@ class Sbn
       end
     end
     
-    # Reconsti
+    # Reconstitute a saved network.
     def self.from_xmlbif(source)
       # convert tags to lower case
       source.gsub!(/(<.*?>)/, '\\1'.downcase)

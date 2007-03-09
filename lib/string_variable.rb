@@ -54,7 +54,7 @@ class Sbn
     end
 
     # create co-variables when new n-grams are encountered
-    def add_training_set(evidence)
+    def add_training_set(evidence) # :nodoc:
       val = evidence[@name].downcase.strip
       len = val.length
       ngrams = []
