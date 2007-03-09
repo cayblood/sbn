@@ -273,6 +273,7 @@
 # * Speedier inference through parallelization
 # * Support for inference of variable relationships from training data
 # * Support for customizing the number of iterations in the MCMC algorithm (currently hard-coded)
+# * Support for customizing the size of ngrams used in string variables
 # * Support for intelligently determining the best number of iterations for MCMC at runtime based on the desired level of precision
 #
 # Please share your own ideas with us and help to improve this library.
