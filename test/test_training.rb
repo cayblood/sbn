@@ -57,7 +57,7 @@ class TestTraining < Test::Unit::TestCase # :nodoc:
     @category.add_training_set(:category => :food, :text => "foo")
     @category.add_training_set(:category => :groceries, :text => 'gro')
     @category.add_training_set(:category => :gas, :text => 'gas')
-    @category.set_probabilities_from_training_data
+    @category.set_probabilities_from_training_data!
     prob_table = @category.instance_variable_get('@probability_table')
     assert_equal prob_table.transpose.last, [0.5, 0.25, 0.25]
     
@@ -70,7 +70,7 @@ class TestTraining < Test::Unit::TestCase # :nodoc:
     numvar.add_training_set(:basicvar => :true, :numvar => 3.0)
     numvar.add_training_set(:basicvar => :false, :numvar => 4.0)
     numvar.add_training_set(:basicvar => :true, :numvar => 5.0)
-    numvar.set_probabilities_from_training_data
+    numvar.set_probabilities_from_training_data!
     prob_table = numvar.instance_variable_get('@probability_table')
     probs = prob_table.transpose.last
     expected_probs = [0.0001, 0.0001, 0.19926, 0.0001, 0.0001, 0.0001,
