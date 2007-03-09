@@ -11,7 +11,7 @@ class Sbn
       xml.comment! <<-EOS
       
         Bayesian network in XMLBIF v0.3 (BayesNet Interchange Format)
-        Produced by SBN4R (Simple Bayesian Network library for Ruby)
+        Produced by SBN (Simple Bayesian Network library)
         Output created #{Time.now}
       EOS
       xml.text! "\n"
