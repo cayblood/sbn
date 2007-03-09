@@ -5,7 +5,7 @@ Gem::manage_gems
 require 'rake/gempackagetask'
 
 spec = Gem::Specification.new do |s|
-  s.name              = "SBN"
+  s.name              = "sbn"
   s.version           = "0.9.0"
   s.author            = "Carl Youngblood"
   s.email             = "carl@youngbloods.org"
