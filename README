@@ -67,7 +67,7 @@ are initialized and connected to one another. The "evidence" is then set. This
 evidence represents observations of variables in the problem state. In this
 case, the <em>Sprinkler</em> variable was observed to be in the <b>:false</b>
 state, and the <em>Rain</em> variable was observed to be in the <b>:true</b>
-state. Setting this evidence in the network is analagous to knowing more about
+state. Setting this evidence in the network is analogous to knowing more about
 the problem space. With more knowledge of the problem space, the posterior
 probabilities of the remaining unobserved variables can be predicted with
 greater accuracy. After setting the evidence, query_variable() is called on
