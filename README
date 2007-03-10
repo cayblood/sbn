@@ -175,12 +175,13 @@ The only currently supported inference algorithm is the Markov Chain Monte
 Carlo (MCMC) algorithm. This is an approximation algorithm. Given the
 complexity of inference in Bayesian networks
 (NP-hard[http://en.wikipedia.org/wiki/NP-hard]), exact inference is often
-infeasible. The MCMC algorithm approximates the posterior probability for each
-variable's state by generating a random set of states for the unset variables
-in proportion to each state's posterior probability. It generates successive
-random states conditioned on the previous values of the non-evidence
-variables. The reason this works is because over time, the amount of time
-spent in each random state is proportional to its posterior probabilty.
+intractable. The MCMC algorithm approximates the posterior probability for
+each variable's state by generating a random set of states for the unset
+variables in proportion to each state's posterior probability. It generates
+successive random states conditioned on the previous values of the
+non-evidence variables. The reason this works is because over time, the amount
+of time spent in each random state is proportional to its posterior
+probabilty.
 
 == Training a Network
 
