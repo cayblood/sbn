@@ -12,11 +12,12 @@ spec = Gem::Specification.new do |s|
   s.homepage          = "http://youngbloods.org/"
   s.platform          = Gem::Platform::RUBY
   s.summary           = "Simple Bayesian Network Library"
-  s.files             = FileList["{test,lib,data}/**/*"].to_a
+  s.files             = FileList["{test,lib}/**/*"].to_a
   s.require_path      = 'lib'
   s.autorequire       = 'sbn'
   s.test_file         = 'test/sbn.rb'
   s.has_rdoc          = true
+  s.rdoc_options      << '--main' << 'README'
   s.extra_rdoc_files  = ["README"]
 end
 
