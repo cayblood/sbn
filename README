@@ -309,7 +309,6 @@ are some of the possible improvements that may be added in future releases:
 * Support for exact inference
 * Support for continuous variables
 * Saving the training data along with the network when saving to XMLBIF
-* More efficient in-memory storage of training data (currently a copy of each training set is kept in each variable)
 * Speedier inference using native C++ with vectorization provided by macstl[http://www.pixelglow.com/macstl/]
 * Speedier inference through parallelization
 * Support for inference of variable relationships from training data

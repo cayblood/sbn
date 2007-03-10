@@ -27,8 +27,6 @@ class Sbn
       # Because string variables add new variables to the net during training,
       # the process of determining state frequencies has to be deferred until
       # the end.  For now, we'll just store the evidence and use it later.
-      # In the future, this code should be optimized to avoid unnecessary
-      # duplication of training data.
       @training_data ||= []
       @training_data << evidence
     end
