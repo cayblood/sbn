@@ -59,8 +59,8 @@ and their parents' states. Since <em>Grass Wet</em> has two parents, it must
 specify all eight possible combinations of states. Since we live in a logical
 universe, each variable's possible states given a specific combination of its
 parents' states must add up to 1.0. Notice that <em>Cloudy</em>'s
-probabilities add up to 1.0, <em>Sprinkler</em>'s states given <em>Cloudy</em>
-== :true add up to 1.0 and so on.
+probabilities add up to 1.0, <em>Sprinkler</em>'s states given
+<em>Cloudy</em> == :true add up to 1.0 and so on.
 
 In the following code, the network shown above is created and its variables
 are initialized and connected to one another. The "evidence" is then set. This
