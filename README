@@ -231,7 +231,7 @@ for serializing Bayesian networks:
  File.open(FILENAME, 'w') {|f| f.write(net.to_xmlbif) }
  reconstituted_net = net.from_xmlbif(File.read(FILENAME))
 
-At present, sample points is not saved with your network, but this feature is
+At present, sample points are not saved with your network, but this feature is
 anticipated in a future release.
 
 == Advanced Variable Types
