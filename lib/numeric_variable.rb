@@ -17,10 +17,10 @@ class Sbn
       super(net, name, probabilities, states)
     end
 
-    # alter the state table based on the variance of the training data
-    def set_probabilities_from_training_data! # :nodoc:
+    # alter the state table based on the variance of the sample points
+    def set_probabilities_from_sample_points! # :nodoc:
       values = []
-      @training_data.each {|evidence| values << evidence[@name] }
+      @sample_points.each {|evidence| values << evidence[@name] }
       stdev = values.standard_deviation
       average = values.average
       increment_amount_for_first_stdev = stdev * 2.0 / @state_count_one.to_f
@@ -48,7 +48,7 @@ class Sbn
       @states = generate_states_from_thresholds
       
       # Now that states have been determined, call parent
-      # class to finish processing training data.
+      # class to finish processing sample points.
       super
     end
     

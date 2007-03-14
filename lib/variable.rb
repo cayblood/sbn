@@ -11,7 +11,7 @@ class Sbn
       @children = []
       @parents = []
       @states = []
-      @state_frequencies = {} # used for storing training data
+      @state_frequencies = {} # used for storing sample points
       set_states(states)
       set_probabilities(probabilities)
       net.add_variable(self)

@@ -20,19 +20,19 @@ class Sbn
       varnames & keys == varnames
     end
 
-    def add_training_set(evidence)
+    def add_sample_point(evidence)
       # reject incomplete evidence sets
-      raise "Incomplete training data" unless is_complete_evidence?(evidence)
+      raise "Incomplete sample points" unless is_complete_evidence?(evidence)
       
-      # Because string variables add new variables to the net during training,
+      # Because string variables add new variables to the net during learning,
       # the process of determining state frequencies has to be deferred until
       # the end.  For now, we'll just store the evidence and use it later.
-      @training_data ||= []
-      @training_data << evidence
+      @sample_points ||= []
+      @sample_points << evidence
     end
 
-    def set_probabilities_from_training_data!
-      return unless @training_data
+    def set_probabilities_from_sample_points!
+      return unless @sample_points
       accumulate_state_frequencies
       sum = 0.0
       @state_frequencies.values.each {|val| sum += val.to_f }
@@ -60,7 +60,7 @@ class Sbn
 
   private
     def accumulate_state_frequencies
-      @training_data.each do |evidence|
+      @sample_points.each do |evidence|
         combination_instance = []
         @parents.each {|p| combination_instance << p.get_observed_state(evidence) }
         combination_instance << get_observed_state(evidence)
@@ -74,18 +74,18 @@ class Sbn
     # Expects data to be an array of hashes containing complete sets of evidence
     # for all variables in the network.  Constructs probability tables for each variable
     # based on the data.
-    def train(data)
-      data.each {|evidence| add_training_set(evidence) }
-      set_probabilities_from_training_data!
+    def learn(data)
+      data.each {|evidence| add_sample_point(evidence) }
+      set_probabilities_from_sample_points!
     end
     
-    def add_training_set(evidence)
+    def add_sample_point(evidence)
       evidence = symbolize_evidence(evidence)
-      @variables.each {|key, val| val.add_training_set(evidence) }
+      @variables.each {|key, val| val.add_sample_point(evidence) }
     end
     
-    def set_probabilities_from_training_data!
-      @variables.each {|key, val| val.set_probabilities_from_training_data! }
+    def set_probabilities_from_sample_points!
+      @variables.each {|key, val| val.set_probabilities_from_sample_points! }
     end
   end
 end
