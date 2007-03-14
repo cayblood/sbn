@@ -43,7 +43,7 @@ http://youngbloods.org/sbn/images/grass_wetness.png
 We'll begin with a network whose probabilities have been pre-determined. This
 example comes from the excellent <em>Artificial Intelligence: A Modern
 Approach</em>, by Russell & Norvig. Later we'll see how to determine a
-network's probabilities from training data. Our sample network has four
+network's probabilities from sample points. Our sample network has four
 variables, each of which has two possible states:
 * <em>Cloudy</em>: <b>:true</b> if sky is cloudy, <b>:false</b> if sky is sunny.
 * <em>Sprinkler</em>: <b>:true</b> if sprinkler was turned on, <b>:false</b> if not. Whether or not it's cloudy has a direct influence on whether or not the sprinkler is turned on, so there is a parent-child relationship between <em>Sprinkler</em> and <em>Cloudy</em>.
@@ -96,7 +96,7 @@ their posterior probabilties.
 === Specifying probabilities
 
 The order that probabilities are supplied is as follows. Always alternate
-between the states of the variable whose probabilties you are supplying.
+between the states of the variable whose probabilities you are supplying.
 Supply the probabilities of these states given the variable's parents in the
 order the parents were added, from right to left, with the rightmost (most
 recently added) parent alternating first. For example, if I have one variable
@@ -183,19 +183,19 @@ non-evidence variables. The reason this works is because over time, the amount
 of time spent in each random state is proportional to its posterior
 probabilty.
 
-== Training a Network
+== Parameter Learning
 
 Although it is sometimes useful to be able to specify a variable's
 probabilities in advance, we usually begin with a clean slate, and only are
 able to make a reasonable estimate of each variable's probabilities after
-collecting sufficient data. This estimation process is easy with SBN. The
-training process requires complete observations for all variables in the
-network. Each set of training data is a hash with keys matching each
+collecting sufficient data. This process is easy with SBN. The parameter
+learning process requires complete sample points for all variables in the
+network. Each set of sample points is a hash with keys matching each
 variable's name and values corresponding to each variable's observed state.
-The more training data you supply to your network, the more accurate its
+The more sample points you supply to your network, the more accurate its
 probability estimates will be.
 
- net.train([
+ net.learn([
    {:cloudy => :true, :sprinkler => :false, :rain => :true, :grass_wet => :true},
    {:cloudy => :true, :sprinkler => :true, :rain => :false, :grass_wet => :true},
    {:cloudy => :false, :sprinkler => :false, :rain => :true, :grass_wet => :true},
@@ -208,18 +208,18 @@ probability estimates will be.
    {:cloudy => :false, :sprinkler => :false, :rain => :false, :grass_wet => :false},
  ])
 
-Training data can also be specified one set at a time and calculation of the
+Sample points can also be specified one set at a time and calculation of the
 probability tables can be deferred until a specific time:
 
- net.add_training_set({:cloudy => :true, :sprinkler => :false, :rain => :true, :grass_wet => :true})
- net.add_training_set({:cloudy => :true, :sprinkler => :true, :rain => :false, :grass_wet => :true})
- net.set_probabilities_from_training_data!
+ net.add_sample_point({:cloudy => :true, :sprinkler => :false, :rain => :true, :grass_wet => :true})
+ net.add_sample_point({:cloudy => :true, :sprinkler => :true, :rain => :false, :grass_wet => :true})
+ net.set_probabilities_from_sample_points!
 
-Networks store the training data you have given them, so that future training
-continues to take previous data into account. The training process is fairly
+Networks store the sample points you have given them, so that future learning
+continues to take previous samples into account. The learning process is fairly
 simple. The frequency of each state combination in each variable is
 determined, and the number of occurrences for each state combination are
-divided by the total number of combinations trained on.
+divided by the total number of combinations learned on.
 
 == Saving and Restoring a Network
 
@@ -231,7 +231,7 @@ for serializing Bayesian networks:
  File.open(FILENAME, 'w') {|f| f.write(net.to_xmlbif) }
  reconstituted_net = net.from_xmlbif(File.read(FILENAME))
 
-At present, training data is not saved with your network, but this feature is
+At present, sample points is not saved with your network, but this feature is
 anticipated in a future release.
 
 == Advanced Variable Types
@@ -241,9 +241,9 @@ of your results.
 
 === Sbn::StringVariable
 Sbn::StringVariable is used for handling string data. Rather than set a
-StringVariable's states manually, rely on the training process. During
-training, you should pass the observed string for this variable for each
-training set. Each observed string is divided into a series of n-grams (short
+StringVariable's states manually, rely on the learning process. During
+learning, you should pass the observed string for this variable for each
+sample point. Each observed string is divided into a series of n-grams (short
 character sequences) matching snippets of the observed string. A new variable
 is created (of class Sbn::StringCovariable) for each ngram, whose state will
 be :true or :false depending on whether the snippet is observed or not. These
@@ -260,13 +260,13 @@ and is thus more difficult to categorize than discrete states. Due to the
 nature of the MCMC algorithm used for inference, every variable in the network
 must have discrete states, but this limitation can be ameliorated by
 dynamically altering a numeric variable's states according to the variance of
-the numeric data. Whenever training occurs, the average and standard deviation
+the numeric data. Whenever learning occurs, the average and standard deviation
 of the observations for the NumericVariable are calculated, and the
 occurrences are divided into multiple categories through a process known as
 discretization. For example, all numbers between 1.0 and 3.5 might be
 classified as one state, and all numbers between 3.5 and 6 might be classified
 in another. The thresholds for each state are based on the mean and standard
-deviation of the observed data, and are recalculated every time training
+deviation of the observed data, and are recalculated every time learning
 occurs, so even though some amount of accuracy is lost by discretization, the
 states chosen should usually be well-adapted to the data in your domain
 (assuming it is somewhat normally distributed). This variable type makes it
@@ -282,24 +282,24 @@ The following example shows a network that uses these advanced variable types:
  category.add_child(amount)
  category.add_child(merchant)
 
-Before training this network, it looks like this:
+Before parameter learning occurs on this network, it looks like this:
 
 http://youngbloods.org/sbn/images/stringvar1.png
 
 The <em>Category</em> variable represents a budget category for a financial
 transaction. The <em>Amount</em> variable is for the amount of the transaction
 and the <em>Merchant</em> variable handles observed strings for the merchant
-where the transaction took place. Suppose we supplied some training data to
+where the transaction took place. Suppose we supplied some sample points to
 this network:
 
- net.add_training_set :category => :gas, :amount => 29.11, :merchant => 'Chevron'
+ net.add_sample_point :category => :gas, :amount => 29.11, :merchant => 'Chevron'
 
-After adding that training set, the network would look something like this:
+After adding that sample point, the network would look something like this:
 
 http://youngbloods.org/sbn/images/stringvar2.png
 
 The variables with dashed edges are the string covariables that were created
-by the managing string variable when it saw a new string in the training data.
+by the managing string variable when it saw a new string in the sample points.
 At present, string variables generate ngrams of length 3, 6, and 10
 characters. It is anticipated that these lengths will become customizable in a
 future release.
@@ -309,10 +309,10 @@ There are many areas where we hope to improve Simple Bayesian Networks. Here
 are some of the possible improvements that may be added in future releases:
 * Support for exact inference
 * Support for continuous variables
-* Saving the training data along with the network when saving to XMLBIF
+* Saving the sample points along with the network when saving to XMLBIF
 * Speedier inference using native C++ with vectorization provided by macstl[http://www.pixelglow.com/macstl/]
 * Speedier inference through parallelization
-* Support for inference of variable relationships from training data
+* Support for inference of variable relationships from sample points
 * Support for customizing the number of iterations in the MCMC algorithm (currently hard-coded)
 * Support for customizing the size of ngrams used in string variables
 * Support for intelligently determining the best number of iterations for MCMC at runtime based on the desired level of precision

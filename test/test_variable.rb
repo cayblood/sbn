@@ -209,21 +209,21 @@ class TestNumericVariable < Test::Unit::TestCase # :nodoc:
     assert_equal @var1.get_observed_state(evidence), states[1]
   end
 
-  def test_set_probabilities_from_training_data
+  def test_set_probabilities_from_sample_points
     data = [0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0]
     temp_data = data.dup
-    @var1.add_training_set({:var1 => temp_data.shift})
-    @var1.add_training_set({:var1 => temp_data.shift})
-    @var1.add_training_set({:var1 => temp_data.shift})
-    @var1.add_training_set({:var1 => temp_data.shift})
-    @var1.add_training_set({:var1 => temp_data.shift})
-    @var1.add_training_set({:var1 => temp_data.shift})
-    @var1.add_training_set({:var1 => temp_data.shift})
-    @var1.add_training_set({:var1 => temp_data.shift})
-    @var1.add_training_set({:var1 => temp_data.shift})
-    @var1.add_training_set({:var1 => temp_data.shift})
-    @var1.add_training_set({:var1 => temp_data.shift})
-    @var1.set_probabilities_from_training_data!
+    @var1.add_sample_point({:var1 => temp_data.shift})
+    @var1.add_sample_point({:var1 => temp_data.shift})
+    @var1.add_sample_point({:var1 => temp_data.shift})
+    @var1.add_sample_point({:var1 => temp_data.shift})
+    @var1.add_sample_point({:var1 => temp_data.shift})
+    @var1.add_sample_point({:var1 => temp_data.shift})
+    @var1.add_sample_point({:var1 => temp_data.shift})
+    @var1.add_sample_point({:var1 => temp_data.shift})
+    @var1.add_sample_point({:var1 => temp_data.shift})
+    @var1.add_sample_point({:var1 => temp_data.shift})
+    @var1.add_sample_point({:var1 => temp_data.shift})
+    @var1.set_probabilities_from_sample_points!
     assert_equal @var1.state_thresholds.shift, data.average - (data.standard_deviation * 2.0)
   end
 
@@ -254,7 +254,7 @@ class TestStringVariable < Test::Unit::TestCase # :nodoc:
     @category = Sbn::Variable.new(@net, :category, [0.33, 0.33, 0.33], [:food, :groceries, :gas])
     @text = Sbn::StringVariable.new(@net, :text)
     @category.add_child(@text)
-    @net.train([
+    @net.learn([
       {:category => :food, :text => 'foo'},
       {:category => :food, :text => 'gro'},
       {:category => :food, :text => 'foo'},
@@ -327,10 +327,10 @@ class TestStringVariable < Test::Unit::TestCase # :nodoc:
     assert covariable_parents.include?(newvar)
   end
 
-  def test_add_training_set
-    # make sure covariables are created with each training set
+  def test_add_sample_point
+    # make sure covariables are created with each sample point
     assert_equal 3, @text.covariables.size
-    @text.add_training_set({:text => "newtext", :category => :gas})
+    @text.add_sample_point({:text => "newtext", :category => :gas})
     assert_equal 11, @text.covariables.size
   end
 

@@ -1,12 +1,9 @@
 digraph untitled
 	{
-		cloudy[label="Cloudy\nP(t) = 0.5\nP(f) = 0.5"];
-		sprinkler[label="Sprinkler\nP(t|t) = 0.1\nP(f|t) = 0.9\nP(t|f) = 0.5\nP(f|f) = 0.5"]
-		rain[label="Rain\nP(t|t) = 0.8\nP(f|t) = 0.2\nP(t|f) = 0.2\nP(f|f) = 0.8"]
-		grass_wet[label="Grass Wet\nP(t|t,t) = 0.99\nP(f|t,t) = 0.01\nP(t|t,f) = 0.9\nP(f|t,f) = 0.1\nP(t|f,t) = 0.9\nP(f|f,t) = 0.1\nP(t|f,f) = 0.0\nP(f|f,f) = 1.0"]
+		cloudy[label=""];
+		sprinkler[label=""]
+		rain[label=""]
 		
 		cloudy -> sprinkler;
-		cloudy -> rain;
-		rain -> grass_wet;
-		sprinkler -> grass_wet;
+		cloudy -> rain[style="dashed"];
 	}

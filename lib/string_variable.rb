@@ -54,7 +54,7 @@ class Sbn
     end
 
     # create co-variables when new n-grams are encountered
-    def add_training_set(evidence) # :nodoc:
+    def add_sample_point(evidence) # :nodoc:
       val = evidence[@name].downcase.strip
       len = val.length
       ngrams = []
@@ -66,14 +66,14 @@ class Sbn
       ngrams.uniq!
       ngrams.each do |ng|
         unless @covariables.has_key?(ng)
-          # these probabilities are temporary and will get erased after training
+          # these probabilities are temporary and will get erased after learning
           newcovar = StringCovariable.new(@net, @name, ng, [0.5, 0.5])
           count = 0
           @covariable_parents.each {|p| newcovar.add_parent(p) }
           @covariable_children.each {|p| newcovar.add_child(p) }
           @covariables[ng] = newcovar
         end
-        @covariables[ng].add_training_set(evidence)
+        @covariables[ng].add_sample_point(evidence)
       end
     end
     

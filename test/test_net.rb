@@ -111,7 +111,7 @@ class TestBasicNet < Test::Unit::TestCase # :nodoc:
     basic_var = Sbn::Variable.new(net, :basic_var)
     string_var = Sbn::StringVariable.new(net, :string_var)
     num_var = Sbn::NumericVariable.new(net, :num_var, [0.5, 0.5], [1.0])
-    string_var.add_training_set({:basic_var => :true, :string_var => "test", :num_var => 1.5})
+    string_var.add_sample_point({:basic_var => :true, :string_var => "test", :num_var => 1.5})
     
     # should not be able to set covariables directly
     assert_raise(RuntimeError) { net.set_evidence({:string_var_covar_tes => :true}) }
