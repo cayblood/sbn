@@ -17,7 +17,7 @@ class Sbn
     def add_variable(variable)
       name = variable.name
       if @variables.has_key? name
-        raise "Variable of same name has already been added to this net"
+        raise "Variable of name #{name} has already been added to this net"
       end
       @variables[name] = variable
     end
