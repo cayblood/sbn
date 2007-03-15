@@ -329,9 +329,12 @@ class TestStringVariable < Test::Unit::TestCase # :nodoc:
 
   def test_add_sample_point
     # make sure covariables are created with each sample point
+    newtext = "newtext"
     assert_equal 3, @text.covariables.size
-    @text.add_sample_point({:text => "newtext", :category => :gas})
-    assert_equal 11, @text.covariables.size
+    @text.add_sample_point({:text => newtext, :category => :gas})
+    ngrams = []
+    Sbn::StringVariable::DEFAULT_NGRAM_SIZES.each {|len| ngrams.concat(newtext.ngrams(len)) }
+    assert_equal 3 + ngrams.size, @text.covariables.size
   end
 
   def test_covariables
@@ -339,7 +342,8 @@ class TestStringVariable < Test::Unit::TestCase # :nodoc:
   end
 
   def test_set_in_evidence_eh
-    assert_raise(RuntimeError) { @text.set_in_evidence?({:text => "newtext", :category => :gas}) } 
+    # assert_raise(RuntimeError) { @text.set_in_evidence?({:text => "newtext", :category => :gas}) } 
+    assert @text.set_in_evidence?({:text => "newtext", :category => :gas})
   end
 
   def test_to_xmlbif_definition

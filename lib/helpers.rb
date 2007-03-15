@@ -47,6 +47,7 @@ class String # :nodoc:
   # ruby-talk post #11792
   def ngrams(len = 1)
     ngrams = []
+    len = size if len > size
     (0..size - len).each do |n|
       ng = self[n...(n + len)]
       ngrams.push(ng)
