@@ -47,6 +47,8 @@ class Sbn
   end
   
   class StringVariable < Variable
+    DEFAULT_NGRAM_SIZES = [10]
+    
     def initialize(net, name = '')
       @net = net
       @covariables = {}
@@ -64,7 +66,7 @@ class Sbn
       # Make ngrams as small as 3 characters in length up to
       # the length of the string.  We may need to whittle this
       # down significantly to avoid severe computational burdens.
-      [3, 5, 10].each {|n| ngrams.concat val.ngrams(n) }
+      DEFAULT_NGRAM_SIZES.each {|n| ngrams.concat val.ngrams(n) }
       ngrams.uniq!
       ngrams.each do |ng|
         unless @covariables.has_key?(ng)
@@ -107,7 +109,8 @@ class Sbn
     # always appear to be set in the evidence so that it won't
     # waste time in the inference process.
     def set_in_evidence?(evidence) # :nodoc:
-      raise "String variables should never be used in inference--only their covariables"
+      true
+      # raise "String variables should never be used in inference--only their covariables"
     end
     
     # This method is used when reconstituting saved networks

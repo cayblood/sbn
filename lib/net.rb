@@ -26,6 +26,7 @@ class Sbn
       newevidence = {}
       evidence.each do |key, val|
         key = key.to_underscore_sym
+        raise "Invalid variable name #{key}." unless @variables.has_key?(key)
         newevidence[key] = @variables[key].transform_evidence_value(val)
       end
       newevidence
