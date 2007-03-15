@@ -81,11 +81,11 @@ class Sbn
     
     def add_sample_point(evidence)
       evidence = symbolize_evidence(evidence)
-      @variables.each {|key, val| val.add_sample_point(evidence) }
+      @variables.keys.each {|key| @variables[key].add_sample_point(evidence) }
     end
     
     def set_probabilities_from_sample_points!
-      @variables.each {|key, val| val.set_probabilities_from_sample_points! }
+      @variables.keys.each {|key| @variables[key].set_probabilities_from_sample_points! }
     end
   end
 end

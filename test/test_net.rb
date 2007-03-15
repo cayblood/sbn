@@ -114,7 +114,7 @@ class TestBasicNet < Test::Unit::TestCase # :nodoc:
     string_var.add_sample_point({:basic_var => :true, :string_var => "test", :num_var => 1.5})
     
     # should not be able to set covariables directly
-    assert_raise(RuntimeError) { net.set_evidence({:string_var_covar_tes => :true}) }
+    assert_raise(RuntimeError) { net.set_evidence({:string_var_covar_1 => :true}) }
     
     net.set_evidence 'BASIC VAR' => 'true', 'string_var' => "TesT", 'num_var' => 3
     evidence = net.instance_variable_get('@evidence')
