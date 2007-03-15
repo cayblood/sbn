@@ -5,9 +5,11 @@ class Sbn
     attr_reader :text_to_match
     
     def initialize(net, manager_name, text_to_match, probabilities)
+      @@covar_count ||= 0
+      @@covar_count += 1
       @manager_name = manager_name
       @text_to_match = text_to_match.downcase
-      super(net, "#{@manager_name}_covar_#{@text_to_match}", probabilities)
+      super(net, "#{@manager_name}_covar_#{@@covar_count}", probabilities)
     end
     
     def to_xmlbif_variable(xml)
