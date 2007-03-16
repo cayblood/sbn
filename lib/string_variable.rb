@@ -47,7 +47,7 @@ class Sbn
   end
   
   class StringVariable < Variable
-    DEFAULT_NGRAM_SIZES = [200]
+    DEFAULT_NGRAM_SIZES = [3, 5, 10]
     
     def initialize(net, name = '')
       @net = net
