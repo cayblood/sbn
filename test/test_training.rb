@@ -59,7 +59,7 @@ class TestLearning < Test::Unit::TestCase # :nodoc:
     @category.add_sample_point(:category => :gas, :text => 'gas')
     @category.set_probabilities_from_sample_points!
     prob_table = @category.instance_variable_get('@probability_table')
-    assert_equal prob_table.transpose.last, [0.5, 0.25, 0.25]
+    assert_equal prob_table.transpose.last, [0.4999, 0.2499, 0.2499]
     
     # test numeric variable
     basicvar = Sbn::Variable.new(@net, :basicvar)
@@ -73,12 +73,12 @@ class TestLearning < Test::Unit::TestCase # :nodoc:
     numvar.set_probabilities_from_sample_points!
     prob_table = numvar.instance_variable_get('@probability_table')
     probs = prob_table.transpose.last
-    expected_probs = [0.0001, 0.0001, 0.19926, 0.0001, 0.0001, 0.0001,
-     0.0001, 0.0001, 0.0001, 0.0001, 0.19926, 0.0001, 0.0001, 0.0001,
-     0.0001, 0.0001, 0.0001, 0.0001, 0.0001, 0.19926, 0.0001, 0.0001,
-     0.0001, 0.0001, 0.0001, 0.0001, 0.0001, 0.19926, 0.0001, 0.0001,
-     0.0001, 0.0001, 0.0001, 0.0001, 0.0001, 0.0001, 0.19926, 0.0001,
-     0.0001, 0.0001, 0.0001, 0.0001]
+    expected_probs = [0.0001, 0.0001, 0.333233333333333, 0.0001, 0.0001,
+      0.0001, 0.0001, 0.0001, 0.0001, 0.0001, 0.333233333333333, 0.0001,
+      0.0001, 0.0001, 0.0001, 0.0001, 0.0001, 0.0001, 0.0001, 0.333233333333333,
+      0.0001, 0.0001, 0.0001, 0.0001, 0.0001, 0.0001, 0.0001, 0.4999,
+      0.0001, 0.0001, 0.0001, 0.0001, 0.0001, 0.0001, 0.0001, 0.0001,
+      0.4999, 0.0001, 0.0001, 0.0001, 0.0001, 0.0001]
     probs.each {|p| assert_in_delta(p, expected_probs.shift, 0.001) }
   end
 

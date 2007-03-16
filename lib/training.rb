@@ -34,25 +34,58 @@ class Sbn
     def set_probabilities_from_sample_points!
       return unless @sample_points
       accumulate_state_frequencies
-      sum = 0.0
-      @state_frequencies.values.each {|val| sum += val.to_f }
-      probabilities = []
-      count_of_zero_prob_states = count_of_nonzero_prob_states = 0
+      
+      # find the sums for each parent combination so we
+      # know how to normalize their associated states
+      sums = {}
       state_combinations.each do |comb|
+        parent_comb = comb.dup
+
+        # remove state for this node so that all
+        # that is left is the parent combination
+        parent_comb.pop
         @state_frequencies[comb] ||= 0
-        prob = @state_frequencies[comb] / sum.to_f
-        probabilities << (prob == 0 ? NEGLIGIBLE_PROBABILITY : prob)
-        if prob == 0
-          count_of_zero_prob_states += 1
+        sums[parent_comb] ||= 0
+        sums[parent_comb] += @state_frequencies[comb]
+      end
+      
+      probabilities = []
+      count_of_zero_prob_states = count_of_nonzero_prob_states = {}
+      last_state = @states.first
+      state_combinations.each do |comb|
+        state = comb.last
+        parent_comb = comb.dup
+        parent_comb.pop
+        prob = @state_frequencies[comb] / sums[parent_comb].to_f
+        probabilities << (prob == 0.0 ? NEGLIGIBLE_PROBABILITY : prob)
+        
+        # Keep track of how many of this node's states were
+        # empty for this particular parent combination, so that
+        # we can pad them with tiny numbers later.  Otherwise,
+        # some exact inference algorithms will fail.
+        if prob == 0.0
+          count_of_zero_prob_states[parent_comb] ||= 0
+          count_of_zero_prob_states[parent_comb] += 1
         else
-          count_of_nonzero_prob_states += 1
+          count_of_nonzero_prob_states[parent_comb] ||= 0
+          count_of_nonzero_prob_states[parent_comb] += 1
         end
       end
       
-      # find states with no probability and give them a very small probabilty so
-      # that inference won't fail
-      amount_to_subtract = count_of_zero_prob_states * NEGLIGIBLE_PROBABILITY / count_of_nonzero_prob_states.to_f
-      probabilities.collect! {|p| p > NEGLIGIBLE_PROBABILITY ? p - amount_to_subtract : p }
+      # pad the zero probabilities
+      count = 0
+      state_combinations.each do |comb|
+        state = comb.last
+        parent_comb = comb.dup
+        parent_comb.pop
+        amount_to_subtract = count_of_zero_prob_states[parent_comb] *
+                             NEGLIGIBLE_PROBABILITY /
+                             count_of_nonzero_prob_states[parent_comb].to_f
+        p = probabilities[count]
+        p = (p > NEGLIGIBLE_PROBABILITY ? p - amount_to_subtract : p)
+        probabilities[count] = p
+        count += 1
+      end
       
       # assign new probabilities
       set_probabilities(probabilities)

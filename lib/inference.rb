@@ -14,7 +14,10 @@ class Sbn
     # variables fixed. The sampling process works because it settles into a
     # "dynamic equilibrium" in which the long-run fraction of time spent in each
     # state is proportional to its posterior probability.
-    def query_variable(varname)
+    # 
+    # Optionally accepts a block that receives a number between 0 and 1 indicating
+    # the percentage of completion. 
+    def query_variable(varname, callback = nil)
       # keep track of number of times a state has been observed
       state_frequencies = {}
       varname = varname.to_underscore_sym
@@ -24,13 +27,14 @@ class Sbn
       e = generate_random_event
       relevant_evidence = e.reject {|key, val| @variables[key].set_in_evidence?(@evidence) }
 
-      MCMC_DEFAULT_SAMPLE_COUNT.times do
+      MCMC_DEFAULT_SAMPLE_COUNT.times do |n|
         state = e[varname]
         state_frequencies[state] += 1
 
         relevant_evidence.each do |vname, vstate|
           e[vname] = @variables[vname].get_random_state_with_markov_blanket(e)
         end
+        yield(n / MCMC_DEFAULT_SAMPLE_COUNT.to_f) if block_given?
       end
 
       # normalize results
