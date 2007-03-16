@@ -46,9 +46,10 @@ class Sbn
         parent_comb.pop
         @state_frequencies[comb] ||= 0
         sums[parent_comb] ||= 0
+
         sums[parent_comb] += @state_frequencies[comb]
       end
-      
+
       probabilities = []
       count_of_zero_prob_states = count_of_nonzero_prob_states = {}
       last_state = @states.first
@@ -118,7 +119,23 @@ class Sbn
     end
     
     def set_probabilities_from_sample_points!
-      @variables.keys.each {|key| @variables[key].set_probabilities_from_sample_points! }
+      # we must first conduct learning on parents then their children
+      unlearned_variables = @variables.keys
+      
+      count = 0
+      size = @variables.size.to_f
+      until unlearned_variables.empty?
+        learnable_variables = @variables.reject do |name, var|
+          reject = false
+          var.parents.each {|p| reject = true if unlearned_variables.include?(p.name) }
+          reject
+        end
+        learnable_variables.keys.each do |key|
+          @variables[key].set_probabilities_from_sample_points!
+          count += 1
+          unlearned_variables.delete(key)
+        end
+      end
     end
   end
 end
