@@ -22,6 +22,8 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 # OTHER DEALINGS IN THE SOFTWARE.
 
+require 'active_support/inflector'
+
 # Thanks to Brian Schrer <ruby.brian _at_ gmail.com> for the
 # following two methods, from ruby-talk post #150456.
 class Object # :nodoc:

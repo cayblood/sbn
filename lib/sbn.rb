@@ -1,5 +1,3 @@
-require 'active_support/inflector'
-
 require 'sbn/version'
 require 'sbn/helpers'
 require 'sbn/variable'
