@@ -1,6 +1,4 @@
-require File.dirname(__FILE__) + '/variable'
-
-class Sbn
+module Sbn
   class NumericVariable < Variable
     DEFAULT_FIRST_STDEV_STATE_COUNT = 14
     DEFAULT_SECOND_STDEV_STATE_COUNT = 6

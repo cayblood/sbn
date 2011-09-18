@@ -1,4 +1,7 @@
-class Sbn
+require 'builder'
+require 'xmlsimple'
+
+module Sbn
   class Net
     # Returns a string containing a representation of the network in XMLBIF format.
     # http://www.cs.cmu.edu/afs/cs/user/fgcozman/www/Research/InterchangeFormat

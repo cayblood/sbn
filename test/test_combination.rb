@@ -1,9 +1,9 @@
 require 'test/unit'
-require File.dirname(__FILE__) + '/../lib/sbn'
+require 'sbn/combination'
 
 class TestCombination < Test::Unit::TestCase # :nodoc:
   def setup
-    @c = Combination.new([[1, 2], [3, 4, 5]])
+    @c = Sbn::Combination.new([[1, 2], [3, 4, 5]])
   end
 
   def test_current

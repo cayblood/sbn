@@ -1,4 +1,4 @@
-class Sbn
+module Sbn
   class Variable
     NEGLIGIBLE_PROBABILITY = 0.0001
     

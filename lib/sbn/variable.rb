@@ -1,4 +1,4 @@
-class Sbn
+module Sbn
   class Variable
     attr_reader :name, :states, :parents, :children, :probability_table
     

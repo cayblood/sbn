@@ -1,4 +1,4 @@
-class Sbn
+module Sbn
   class Net
     MCMC_DEFAULT_SAMPLE_COUNT = 2000
 

@@ -1,6 +1,6 @@
 = SBN - Simple Bayesian Networks
 == Software License Agreement
-Copyright (c) 2005-2007 Carl Youngblood mailto:carl@youngbloods.org
+Copyright (c) 2005-2011 Carl Youngblood mailto:carl@youngbloods.org
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -38,7 +38,7 @@ Installation of SBN is simple:
  # gem install sbn
 
 == A Basic Example
-http://youngbloods.org/sbn/images/grass_wetness.png
+https://github.com/downloads/cayblood/sbn/grass_wetness.png
 
 We'll begin with a network whose probabilities have been pre-determined. This
 example comes from the excellent <em>Artificial Intelligence: A Modern
@@ -284,7 +284,7 @@ The following example shows a network that uses these advanced variable types:
 
 Before parameter learning occurs on this network, it looks like this:
 
-http://youngbloods.org/sbn/images/stringvar1.png
+https://github.com/downloads/cayblood/sbn/stringvar1.png
 
 The <em>Category</em> variable represents a budget category for a financial
 transaction. The <em>Amount</em> variable is for the amount of the transaction
@@ -296,7 +296,7 @@ this network:
 
 After adding that sample point, the network would look something like this:
 
-http://youngbloods.org/sbn/images/stringvar2.png
+https://github.com/downloads/cayblood/sbn/stringvar2.png
 
 The variables with dashed edges are the string covariables that were created
 by the managing string variable when it saw a new string in the sample points.

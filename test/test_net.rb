@@ -1,5 +1,5 @@
 require 'test/unit'
-require File.dirname(__FILE__) + '/../lib/sbn'
+require 'sbn'
 
 class TestNet < Test::Unit::TestCase # :nodoc:
   def setup

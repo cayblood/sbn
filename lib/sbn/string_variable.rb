@@ -1,6 +1,4 @@
-require File.dirname(__FILE__) + '/variable'
-
-class Sbn
+module Sbn
   class StringCovariable < Variable # :nodoc:
     attr_reader :text_to_match
     

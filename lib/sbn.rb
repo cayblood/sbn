@@ -1,6 +1,12 @@
-require 'rubygems'
-require 'active_support'
-gem 'builder', '>=2.0'
-require 'builder'
+require 'active_support/inflector'
 
-Dir[File.join(File.dirname(__FILE__), '*.rb')].sort.each { |lib| require lib unless lib == 'sbn.rb' }
+require 'sbn/version'
+require 'sbn/helpers'
+require 'sbn/variable'
+require 'sbn/numeric_variable'
+require 'sbn/string_variable'
+require 'sbn/combination'
+require 'sbn/formats'
+require 'sbn/inference'
+require 'sbn/learning'
+require 'sbn/net'

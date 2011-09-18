@@ -1,4 +1,4 @@
-class Sbn
+module Sbn
   class Net
     attr_reader :name, :variables
     
