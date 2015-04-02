@@ -3,6 +3,20 @@ require 'xmlsimple'
 
 module Sbn
   class Net
+
+    # Returns a JSON Approximation of XMLBIF
+    #
+    def to_json
+      {
+        version: '0.3',
+        network: {
+          name: @name,
+          variables: @variables.values.map { |v| v.to_json_variable },
+          definitions: @variables.values.map{ |v| v.to_json_definition }
+        }
+      }
+    end
+
     # Returns a string containing a representation of the network in XMLBIF format.
     # http://www.cs.cmu.edu/afs/cs/user/fgcozman/www/Research/InterchangeFormat
     def to_xmlbif

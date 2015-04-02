@@ -43,6 +43,18 @@ module Sbn
       end
     end
 
+    def to_json_variable
+      {
+        name: @name.to_s,
+        outcomes: @states.each { |s| s.to_s },
+        type: 'nature'
+      }
+    end
+
+    def to_json_definition
+      { name: @name,  given: @parents.map(&:name), table: @probability_table.transpose.last.map(&:to_s) }
+    end
+
     def set_states(states)
       states.symbolize_values!
       @states = states
