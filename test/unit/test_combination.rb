@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class TestCombination < Minitest::Unit::TestCase # :nodoc:
+class TestCombination < Minitest::Test # :nodoc:
   def setup
     @c = Sbn::Combination.new([[1, 2], [3, 4, 5]])
   end

@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class TestLearning < Minitest::Unit::TestCase # :nodoc:
+class TestLearning < Minitest::Test # :nodoc:
   def setup
     @net = Sbn::Net.new("Categorization")
     @category = Sbn::Variable.new(@net, :category, [0.33, 0.33, 0.33], [:food, :groceries, :gas])

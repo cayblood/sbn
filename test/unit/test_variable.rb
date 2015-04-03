@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class TestVariable < Minitest::Unit::TestCase # :nodoc:
+class TestVariable < Minitest::Test # :nodoc:
   def setup
     @net = Sbn::Net.new
     @var1 = Sbn::Variable.new(@net, "var1")
@@ -196,7 +196,7 @@ class TestVariable < Minitest::Unit::TestCase # :nodoc:
   end
 end
 
-class TestNumericVariable < Minitest::Unit::TestCase # :nodoc:
+class TestNumericVariable < Minitest::Test # :nodoc:
   def setup
     @net = Sbn::Net.new
     @var1 = Sbn::NumericVariable.new(@net, "var1", [0.25, 0.25, 0.25, 0.25], [5.0, 10.0, 15.0])
@@ -247,7 +247,7 @@ class TestNumericVariable < Minitest::Unit::TestCase # :nodoc:
   end
 end
 
-class TestStringVariable < Minitest::Unit::TestCase # :nodoc:
+class TestStringVariable < Minitest::Test # :nodoc:
   def setup
     @net = Sbn::Net.new("Categorization")
     @category = Sbn::Variable.new(@net, :category, [0.33, 0.33, 0.33], [:food, :groceries, :gas])

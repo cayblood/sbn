@@ -5,7 +5,7 @@ class EnumsTester
   bitwise_enums %w(ONE TWO FOUR EIGHT)  
 end
 
-class TestHelpers < Minitest::Unit::TestCase # :nodoc:
+class TestHelpers < Minitest::Test # :nodoc:
   # Tests for Enumerable helpers
   def test_sum
     assert_equal 45, (1..9).sum
