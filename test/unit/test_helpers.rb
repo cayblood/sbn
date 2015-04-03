@@ -1,12 +1,11 @@
-require 'test/unit'
-require 'sbn/helpers'
+require 'test_helper'
 
 class EnumsTester
   enums %w(FOO BAR BAZ)
   bitwise_enums %w(ONE TWO FOUR EIGHT)  
 end
 
-class TestHelpers < Test::Unit::TestCase # :nodoc:
+class TestHelpers < Minitest::Unit::TestCase # :nodoc:
   # Tests for Enumerable helpers
   def test_sum
     assert_equal 45, (1..9).sum
@@ -43,7 +42,7 @@ class TestHelpers < Test::Unit::TestCase # :nodoc:
   end
   
   def test_symbolize_values
-    assert_not_equal %w(one two three), [:one, :two, :three]
+    refute_equal %w(one two three), [:one, :two, :three]
     assert_equal %w(one two three).symbolize_values, [:one, :two, :three]
     arr = %w(one two three)
     arr.symbolize_values!
@@ -51,7 +50,7 @@ class TestHelpers < Test::Unit::TestCase # :nodoc:
   end
   
   def test_symbolize_keys_and_values
-    assert_not_equal({"one" => "two", "three" => "four"}, {:one => :two, :three => :four})
+    refute_equal({"one" => "two", "three" => "four"}, {:one => :two, :three => :four})
     assert_equal({"one" => "two", "three" => "four"}.symbolize_keys_and_values, {:one => :two, :three => :four})
     h = {"one" => "two", "three" => "four"}
     h.symbolize_keys_and_values!

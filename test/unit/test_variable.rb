@@ -1,7 +1,6 @@
-require 'test/unit'
-require 'sbn'
+require 'test_helper'
 
-class TestVariable < Test::Unit::TestCase # :nodoc:
+class TestVariable < Minitest::Unit::TestCase # :nodoc:
   def setup
     @net = Sbn::Net.new
     @var1 = Sbn::Variable.new(@net, "var1")
@@ -25,7 +24,7 @@ class TestVariable < Test::Unit::TestCase # :nodoc:
     children_before = @var1.children.dup
     @var1.add_child_no_recurse(@var2)
     children_after = @var1.children.dup
-    assert_not_equal children_before, children_after
+    refute_equal children_before, children_after
     assert children_after.include?(@var2)
 
     # variable shouldn't be able to add same child twice
@@ -52,7 +51,7 @@ class TestVariable < Test::Unit::TestCase # :nodoc:
     parents_before = @var1.parents.dup
     @var1.add_parent_no_recurse(@var2)
     parents_after = @var1.parents.dup
-    assert_not_equal parents_before, parents_after
+    refute_equal parents_before, parents_after
     assert parents_after.include?(@var2)
 
     # variable shouldn't be able to add same parent twice
@@ -125,7 +124,7 @@ class TestVariable < Test::Unit::TestCase # :nodoc:
     assert_nil @var2.probability_table
     
     @var2.set_probabilities([0.25, 0.75, 0.2, 0.8])
-    assert_not_nil @var2.probability_table
+    refute_nil @var2.probability_table
     
     expected_table = [[[:true, :true], 0.25],
                       [[:true, :false], 0.75],
@@ -144,11 +143,11 @@ class TestVariable < Test::Unit::TestCase # :nodoc:
     @var1.add_child(@var2)
     probs = @var2.instance_variable_get('@probabilities')
     new_probs = [0.25, 0.75, 0.2, 0.8]
-    assert_not_equal probs, new_probs
+    refute_equal probs, new_probs
   
     @var2.set_probabilities(new_probs)
     probs = @var2.instance_variable_get('@probabilities')
-    assert_not_nil probs, new_probs
+    refute_nil probs, new_probs
   end
 
   def test_set_probability
@@ -168,7 +167,7 @@ class TestVariable < Test::Unit::TestCase # :nodoc:
 
   def test_states
     var = Sbn::Variable.new(@net, :var3, [], [])
-    assert_not_nil var.states
+    refute_nil var.states
     assert_equal var.states, []
   end
 
@@ -197,7 +196,7 @@ class TestVariable < Test::Unit::TestCase # :nodoc:
   end
 end
 
-class TestNumericVariable < Test::Unit::TestCase # :nodoc:
+class TestNumericVariable < Minitest::Unit::TestCase # :nodoc:
   def setup
     @net = Sbn::Net.new
     @var1 = Sbn::NumericVariable.new(@net, "var1", [0.25, 0.25, 0.25, 0.25], [5.0, 10.0, 15.0])
@@ -248,7 +247,7 @@ class TestNumericVariable < Test::Unit::TestCase # :nodoc:
   end
 end
 
-class TestStringVariable < Test::Unit::TestCase # :nodoc:
+class TestStringVariable < Minitest::Unit::TestCase # :nodoc:
   def setup
     @net = Sbn::Net.new("Categorization")
     @category = Sbn::Variable.new(@net, :category, [0.33, 0.33, 0.33], [:food, :groceries, :gas])
@@ -338,11 +337,11 @@ class TestStringVariable < Test::Unit::TestCase # :nodoc:
   end
 
   def test_covariables
-    assert_not_nil @text.covariables
+    refute_nil @text.covariables
   end
 
   def test_set_in_evidence_eh
-    # assert_raise(RuntimeError) { @text.set_in_evidence?({:text => "newtext", :category => :gas}) } 
+    # assert_raises(RuntimeError) { @text.set_in_evidence?({:text => "newtext", :category => :gas}) } 
     assert @text.set_in_evidence?({:text => "newtext", :category => :gas})
   end
 

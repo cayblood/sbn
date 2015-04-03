@@ -1,9 +1,17 @@
-require "bundler/gem_tasks"
+begin
+  require 'bundler/setup'
+rescue LoadError
+  puts 'You must `gem install bundler` and `bundle install` to run rake tasks'
+end
+require 'rake/testtask'
 
-task :default => :test
+Bundler::GemHelper.install_tasks
 
-task :test do
-  exec "testrb test"
+Rake::TestTask.new do |t|
+  t.libs << "lib"
+  t.libs << "test"
+  t.test_files = FileList['test/**/test*.rb']
+  t.verbose = false
 end
 
 task :doc do
