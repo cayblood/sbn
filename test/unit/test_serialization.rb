@@ -13,8 +13,8 @@ class TestSerialization < Minitest::Test # :nodoc:
     @num_var.add_sample_point(basic_var: :false, num_var: 4.0)
     @num_var.add_sample_point(basic_var: :true, num_var: 5.0)
     @net.set_probabilities_from_sample_points!
+    @loaded_net = Sbn::Net.from_json(@net.to_json)
   end
-
 
   def test_json_serialization
     json = @net.to_json
@@ -25,25 +25,34 @@ class TestSerialization < Minitest::Test # :nodoc:
     end
   end
 
-  def test_json_loading
-    loaded_net = Sbn::Net.from_json(@net.to_json)
-    assert_equal :json_test, loaded_net.name
-    assert_equal @net.variables.count, loaded_net.variables.count
-    refute_equal @net.object_id, loaded_net.object_id
-
-    [:basic_var, :num_var].each do |name|
-      original, loaded = @net.variables[name], loaded_net.variables[name]
-      refute_equal original.object_id, loaded.object_id
-      assert_equal original.name, loaded.name
-      assert_equal original.probabilities, loaded.probabilities
-      assert_equal original.probability_table, loaded.probability_table
-      assert_equal original.class, loaded.class
-    end
+  def test_json_net_loading
+    assert_equal :json_test, @loaded_net.name
+    assert_equal @net.variables.count, @loaded_net.variables.count
+    refute_equal @net.object_id, @loaded_net.object_id
   end
 
-  def test_num_var_json
-    json = @num_var.to_json_variable
-    assert_equal false, json[:parents].empty?
+  def test_json_loading_variables
+    original, loaded = @net.variables[:basic_var], @loaded_net.variables[:basic_var]
+    assert_basic_serialization original, loaded
+    assert_equal 1, loaded.children.count
+    assert_equal @loaded_net.variables[:num_var].object_id, loaded.children.last.object_id
+  end
+
+  def test_json_loading_numeric_variables
+    original, loaded = @net.variables[:num_var], @loaded_net.variables[:num_var]
+    assert_basic_serialization original, loaded
+    assert_equal 1, loaded.parents.count
+    assert_equal @loaded_net.variables[:basic_var].object_id, loaded.parents.last.object_id
+  end
+
+  protected
+
+  def assert_basic_serialization(original, loaded)
+    refute_equal original.object_id, loaded.object_id
+    assert_equal original.name, loaded.name
+    assert_equal original.probabilities, loaded.probabilities
+    assert_equal original.probability_table, loaded.probability_table
+    assert_equal original.class, loaded.class
   end
 
 end
