@@ -1,6 +1,6 @@
 module Sbn
   class Variable
-    attr_reader :name, :states, :parents, :children, :probability_table
+    attr_reader :name, :states, :parents, :children, :probability_table, :probabilities
     
     def initialize(net, name = '', probabilities = [0.5, 0.5], states = [:true, :false])
       @net = net
@@ -46,9 +46,20 @@ module Sbn
     def to_json_variable
       {
         name: @name.to_s,
-        outcomes: @states.each { |s| s.to_s },
+        states: @states.map(&:to_s),
+        probability_table: @probability_table,
+        probabilities: @probabilities,
+        parents: @parents.map(&:name),
         type: 'nature'
       }
+    end
+
+    def self.from_json(net, json)
+      json = JSON.load(json) unless json.is_a?(Hash)
+
+      new(net, json[:name], json[:probabilities], json[:states]).tap do |var|
+        var.set_probability_table json[:probability_table]
+      end
     end
 
     def to_json_definition
@@ -153,6 +164,10 @@ module Sbn
         probs = @probabilities.dup
         @probability_table = state_combinations.collect {|e| [e, probs.shift] }
       end
+    end
+
+    def set_probability_table(cpt)
+      @probability_table = cpt
     end
 
     def evaluate_marginal(state, event) # :nodoc:
