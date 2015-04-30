@@ -1,6 +1,7 @@
 require 'test_helper'
 
-class TestCombination < Minitest::Test # :nodoc:
+class CombinationTest < Minitest::Test # :nodoc:
+
   def setup
     @c = Sbn::Combination.new([[1, 2], [3, 4, 5]])
   end
@@ -47,4 +48,5 @@ class TestCombination < Minitest::Test # :nodoc:
     assert_equal @c.prev_combination, [1, 4]
     assert_equal @c.prev_combination, [1, 3]
   end
+
 end

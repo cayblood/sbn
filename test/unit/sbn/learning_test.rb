@@ -1,6 +1,7 @@
 require 'test_helper'
 
-class TestLearning < Minitest::Test # :nodoc:
+class LearningTest < Minitest::Test # :nodoc:
+
   def setup
     @net = Sbn::Net.new("Categorization")
     @category = Sbn::Variable.new(@net, :category, [0.33, 0.33, 0.33], [:food, :groceries, :gas])
@@ -102,4 +103,5 @@ class TestLearning < Minitest::Test # :nodoc:
       assert sample_points.include?(set) if sample_points
     end
   end
+
 end

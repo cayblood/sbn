@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class TestNet < Minitest::Test # :nodoc:
+class NetTest < Minitest::Test # :nodoc:
   def setup
     @net       = Sbn::Net.new("Grass Wetness Belief Net")
     @cloudy    = Sbn::Variable.new(@net, :cloudy, [0.5, 0.5])

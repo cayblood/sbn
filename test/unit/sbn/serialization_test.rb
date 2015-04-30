@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class TestSerialization < Minitest::Test # :nodoc:
+class SerializationTest < Minitest::Test # :nodoc:
 
   def setup
     @net = Sbn::Net.new("JSON Test")
