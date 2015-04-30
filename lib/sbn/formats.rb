@@ -17,7 +17,13 @@ module Sbn
         connect_parents = []
 
         json_net[:variables].each_with_index do |node, index|
-          variable = Variable.from_json(net, node)
+          variable =  case
+                      when node.has_key?(:state_thresholds)
+                        NumericVariable.from_json(net, node)
+                      else
+                        Variable.from_json(net, node)
+                      end
+
           connect_parents << [variable, node[:parents]] unless node[:parents].empty?
         end
 

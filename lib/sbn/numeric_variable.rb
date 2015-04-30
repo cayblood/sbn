@@ -4,6 +4,14 @@ module Sbn
     DEFAULT_SECOND_STDEV_STATE_COUNT = 6
     
     attr_reader :state_thresholds
+
+    def self.from_json(net, json)
+      json = JSON.load(json) unless json.is_a?(Hash)
+
+      new(net, json[:name], json[:probabilities], json[:state_thresholds], outcomes: json[:states]).tap do |var|
+        var.set_probability_table json[:probability_table]
+      end
+    end
     
     def initialize(net, name, probabilities = [], state_thresholds = [], options = {})
       @state_count_one = options.fetch(:first_stdev_state_count, DEFAULT_FIRST_STDEV_STATE_COUNT).to_f.round
@@ -11,7 +19,7 @@ module Sbn
       @state_count_one += 1 if @state_count_one.odd?
       @state_count_two += 1 if @state_count_two.odd?
       @state_thresholds = state_thresholds
-      states = generate_states_from_thresholds
+      states = options.fetch(:outcomes, generate_states_from_thresholds)
       super(net, name, probabilities, states)
     end
 
@@ -52,6 +60,10 @@ module Sbn
     
     def to_xmlbif_variable(xml) # :nodoc:
       super(xml) {|x| x.property("StateThresholds = #{@state_thresholds.join(',')}") }
+    end
+
+    def to_json_variable
+      super.merge state_thresholds: @state_thresholds
     end
     
     def get_observed_state(evidence) # :nodoc:
