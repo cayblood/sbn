@@ -37,6 +37,7 @@ class TestSerialization < Minitest::Test # :nodoc:
       assert_equal original.name, loaded.name
       assert_equal original.probabilities, loaded.probabilities
       assert_equal original.probability_table, loaded.probability_table
+      assert_equal original.class, loaded.class
     end
   end
 
