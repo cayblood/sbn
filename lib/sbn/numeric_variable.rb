@@ -68,14 +68,18 @@ module Sbn
     
     def get_observed_state(evidence) # :nodoc:
       num = evidence[@name]
-      thresholds = @state_thresholds.dup
-      index = 0
-      t = thresholds.shift
-      while num >= t and !thresholds.empty? do
+      if num.is_a?(Symbol)
+        index = @states.index(num)
+      else
+        thresholds = @state_thresholds.dup
+        index = 0
         t = thresholds.shift
-        index += 1
+        while num >= t and !thresholds.empty? do
+          t = thresholds.shift
+          index += 1
+        end
+        index += 1 if num >= t and thresholds.empty?
       end
-      index += 1 if num >= t and thresholds.empty?
       @states[index]
     end
 
