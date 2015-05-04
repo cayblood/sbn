@@ -47,11 +47,12 @@ module Sbn
   class StringVariable < Variable
     DEFAULT_NGRAM_SIZES = [3, 5, 10]
     
-    def initialize(net, name = '')
+    def initialize(net, name = '', options = {})
       @net = net
       @covariables = {}
       @covariable_children = []
       @covariable_parents = []
+      @ngram_sizes = options.fetch(:ngram_sizes, DEFAULT_NGRAM_SIZES)
       super(net, name, [], [])
     end
 
@@ -64,7 +65,7 @@ module Sbn
       # Make ngrams as small as 3 characters in length up to
       # the length of the string.  We may need to whittle this
       # down significantly to avoid severe computational burdens.
-      DEFAULT_NGRAM_SIZES.each {|n| ngrams.concat val.ngrams(n) }
+      @ngram_sizes.each {|n| ngrams.concat val.ngrams(n) }
       ngrams.uniq!
       ngrams.each do |ng|
         unless @covariables.has_key?(ng)
