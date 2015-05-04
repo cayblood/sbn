@@ -46,6 +46,7 @@ module Sbn
   
   class StringVariable < Variable
     DEFAULT_NGRAM_SIZES = [3, 5, 10]
+    attr_reader :ngram_sizes
     
     def initialize(net, name = '', options = {})
       @net = net

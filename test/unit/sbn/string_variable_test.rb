@@ -83,8 +83,7 @@ class StringVariableTest < Minitest::Test # :nodoc:
     newtext = "newtext"
     assert_equal 3, @text.covariables.size
     @text.add_sample_point({text: newtext, category: :gas})
-    ngrams = []
-    Sbn::StringVariable::DEFAULT_NGRAM_SIZES.each {|len| ngrams.concat(newtext.ngrams(len)) }
+    ngrams = @text.ngram_sizes.map { |len| newtext.ngrams(len) }
     assert_equal 3 + ngrams.size, @text.covariables.size
   end
 
