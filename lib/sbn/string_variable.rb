@@ -81,9 +81,7 @@ module Sbn
     
     # returns an array of the variable's string covariables in alphabetical order
     def covariables # :nodoc:
-      returnval = []
-      @covariables.keys.sort.each {|key| returnval << @covariables[key] }
-      returnval
+      @covariables.keys.sort.map {|key| @covariables[key] }
     end
     
     def to_xmlbif_variable(xml) # :nodoc:
