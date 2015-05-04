@@ -71,7 +71,6 @@ module Sbn
         unless @covariables.has_key?(ng)
           # these probabilities are temporary and will get erased after learning
           newcovar = StringCovariable.new(@net, @name, ng, [0.5, 0.5])
-          count = 0
           @covariable_parents.each {|p| newcovar.add_parent(p) }
           @covariable_children.each {|p| newcovar.add_child(p) }
           @covariables[ng] = newcovar
