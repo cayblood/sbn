@@ -13,11 +13,11 @@ class SerializationTest < Minitest::Test # :nodoc:
     @num_var.add_sample_point(basic_var: :false, num_var: 4.0)
     @num_var.add_sample_point(basic_var: :true, num_var: 5.0)
     @net.set_probabilities_from_sample_points!
-    @loaded_net = Sbn::Net.from_json(@net.to_json)
+    @loaded_net = Sbn::Net.from_json(@net.to_json_bayes_net)
   end
 
   def test_json_serialization
-    json = @net.to_json
+    json = @net.to_json_bayes_net
     assert_equal "0.3", json[:version]
     assert_equal :json_test, json[:network][:name]
     json[:network].tap do |net|
