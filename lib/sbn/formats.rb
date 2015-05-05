@@ -37,7 +37,7 @@ module Sbn
 
     # Returns a JSON Approximation of XMLBIF
     #
-    def to_json
+    def to_json_bayes_net
       {
         version: '0.3',
         network: {
