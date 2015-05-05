@@ -13,24 +13,6 @@ class NumericVariableTest < Minitest::Test # :nodoc:
     assert_equal @var1.get_observed_state(evidence), states[1]
   end
 
-  def test_set_probabilities_from_sample_points
-    data = [0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0]
-    temp_data = data.dup
-    @var1.add_sample_point({:var1 => temp_data.shift})
-    @var1.add_sample_point({:var1 => temp_data.shift})
-    @var1.add_sample_point({:var1 => temp_data.shift})
-    @var1.add_sample_point({:var1 => temp_data.shift})
-    @var1.add_sample_point({:var1 => temp_data.shift})
-    @var1.add_sample_point({:var1 => temp_data.shift})
-    @var1.add_sample_point({:var1 => temp_data.shift})
-    @var1.add_sample_point({:var1 => temp_data.shift})
-    @var1.add_sample_point({:var1 => temp_data.shift})
-    @var1.add_sample_point({:var1 => temp_data.shift})
-    @var1.add_sample_point({:var1 => temp_data.shift})
-    @var1.set_probabilities_from_sample_points!
-    assert_equal @var1.state_thresholds.shift, data.average - (data.standard_deviation * 2.0)
-  end
-
   def test_state_thresholds
     assert_equal @var1.state_thresholds, [5.0, 10.0, 15.0]
   end
@@ -49,6 +31,14 @@ class NumericVariableTest < Minitest::Test # :nodoc:
     </variable>
     EOS
     assert_equal @var1.to_xmlbif_variable(xml).gsub(/\s+/, ''), expected_output.gsub(/\s+/, '')
+  end
+
+  def test_set_probabilities_from_sample_points
+    sampled = Sbn::NumericVariable.new(@net, "sampled")
+    data = [0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0]
+    data.each { |v| sampled.add_sample_point({:sampled => v}) }
+    sampled.set_probabilities_from_sample_points!
+    assert_equal sampled.state_thresholds.shift, data.average - (data.standard_deviation * 2.0)
   end
 
 end
