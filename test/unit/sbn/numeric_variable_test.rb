@@ -41,4 +41,16 @@ class NumericVariableTest < Minitest::Test # :nodoc:
     assert_equal sampled.state_thresholds.shift, data.average - (data.standard_deviation * 2.0)
   end
 
+  def test_user_specified_state_thresholds
+    user_threshold = Sbn::NumericVariable.new(@net, "user_threshold", [], [0, 5, 10])
+    [1.0, 8, 11].each { |point| user_threshold.add_sample_point(user_threshold: point) }
+    user_threshold.set_probabilities_from_sample_points!
+    
+    assert_equal [:lt0, :gte0lt5, :gte5lt10, :gte10], user_threshold.states
+    assert_equal :lt0, user_threshold.get_observed_state(user_threshold: -2)
+    assert_equal :gte0lt5, user_threshold.get_observed_state(user_threshold: 3)
+    assert_equal :gte5lt10, user_threshold.get_observed_state(user_threshold: 7)
+    assert_equal :gte10, user_threshold.get_observed_state(user_threshold: 12)
+  end
+
 end
