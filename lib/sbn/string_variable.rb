@@ -2,12 +2,12 @@ module Sbn
   class StringCovariable < Variable # :nodoc:
     attr_reader :text_to_match
     
-    def initialize(net, manager_name, text_to_match, probabilities)
+    def initialize(net, manager_name, text_to_match)
       @@covar_count ||= 0
       @@covar_count += 1
       @manager_name = manager_name
       @text_to_match = text_to_match.downcase
-      super(net, "#{@manager_name}_covar_#{@@covar_count}", probabilities)
+      super(net, "#{@manager_name}_covar_#{@@covar_count}")
     end
     
     def to_xmlbif_variable(xml)
@@ -70,8 +70,7 @@ module Sbn
       ngrams.uniq!
       ngrams.each do |ng|
         unless @covariables.has_key?(ng)
-          # these probabilities are temporary and will get erased after learning
-          newcovar = StringCovariable.new(@net, @name, ng, [0.5, 0.5])
+          newcovar = StringCovariable.new(@net, @name, ng)
           @covariable_parents.each {|p| newcovar.add_parent(p) }
           @covariable_children.each {|p| newcovar.add_child(p) }
           @covariables[ng] = newcovar
