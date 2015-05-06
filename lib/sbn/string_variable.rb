@@ -1,6 +1,14 @@
 module Sbn
   class StringCovariable < Variable # :nodoc:
     attr_reader :text_to_match
+
+    def self.from_json(net, json)
+      json = JSON.load(json) unless json.is_a?(Hash)
+
+      new(net, json[:manager_name], json[:text_to_match], json[:probabilities]).tap do |var|
+        var.set_probability_table json[:probability_table]
+      end
+    end
     
     def initialize(net, manager_name, text_to_match)
       @@covar_count ||= 0
@@ -15,6 +23,10 @@ module Sbn
         x.property("ManagerVariableName = #{@manager_name.to_s}")
         x.property("TextToMatch = #{@text_to_match.inspect}")
       end
+    end
+
+    def to_json_variable
+      super.merge text_to_match: @text_to_match, manager_name: @manager_name
     end
     
     def evidence_name # :nodoc:
