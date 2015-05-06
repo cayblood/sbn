@@ -53,4 +53,16 @@ class NumericVariableTest < Minitest::Test # :nodoc:
     assert_equal :gte10, user_threshold.get_observed_state(user_threshold: 12)
   end
 
+  def test_lower_bound_option
+    unbounded = Sbn::NumericVariable.new(@net, "unbounded")
+    lower_bound = Sbn::NumericVariable.new(@net, "lower_bound", [], [], lower_bound: 0)
+    nodes = [unbounded, lower_bound]
+    [ 1.0, 3.0].each do |point|
+      nodes.each { |n| n.add_sample_point n.name => point }
+    end
+    nodes.each(&:set_probabilities_from_sample_points!)
+    assert_equal 21, unbounded.states.count
+    assert_equal 18, lower_bound.states.count
+  end
+
 end
