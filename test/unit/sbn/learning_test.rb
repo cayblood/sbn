@@ -1,7 +1,7 @@
-require 'test/unit'
-require 'sbn'
+require 'test_helper'
 
-class TestLearning < Test::Unit::TestCase # :nodoc:
+class LearningTest < Minitest::Test # :nodoc:
+
   def setup
     @net = Sbn::Net.new("Categorization")
     @category = Sbn::Variable.new(@net, :category, [0.33, 0.33, 0.33], [:food, :groceries, :gas])
@@ -40,7 +40,7 @@ class TestLearning < Test::Unit::TestCase # :nodoc:
   end
 
   def test_var_add_sample_point
-    assert_raise(RuntimeError) { @category.add_sample_point(:text => "apples") }
+    assert_raises(RuntimeError) { @category.add_sample_point(:text => "apples") }
     
     # we have to add at least one sample point to initialize the container
     @category.add_sample_point(:category => :groceries, :text => "albertsons")
@@ -80,6 +80,8 @@ class TestLearning < Test::Unit::TestCase # :nodoc:
       0.0001, 0.0001, 0.0001, 0.0001, 0.0001, 0.0001, 0.0001, 0.0001,
       0.4999, 0.0001, 0.0001, 0.0001, 0.0001, 0.0001]
     probs.each {|p| assert_in_delta(p, expected_probs.shift, 0.001) }
+
+    @net.query_variable(:numvar)
   end
 
   def test_accumulate_state_frequencies
@@ -101,4 +103,5 @@ class TestLearning < Test::Unit::TestCase # :nodoc:
       assert sample_points.include?(set) if sample_points
     end
   end
+
 end

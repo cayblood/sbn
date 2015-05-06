@@ -1,7 +1,6 @@
-require 'test/unit'
-require 'sbn'
+require 'test_helper'
 
-class TestNet < Test::Unit::TestCase # :nodoc:
+class NetTest < Minitest::Test # :nodoc:
   def setup
     @net       = Sbn::Net.new("Grass Wetness Belief Net")
     @cloudy    = Sbn::Variable.new(@net, :cloudy, [0.5, 0.5])
@@ -76,7 +75,7 @@ class TestNet < Test::Unit::TestCase # :nodoc:
     net2 = generate_simple_network
     net3 = Sbn::Net.new('Another Net')
     assert_equal net1, net2
-    assert_not_equal net1, net3
+    refute_equal net1, net3
   end
   
   def test_add_variable
@@ -97,14 +96,14 @@ class TestNet < Test::Unit::TestCase # :nodoc:
   
   def test_set_evidence
     net = generate_simple_network
-    net.set_evidence :var2 => :false
+    net.set_evidence 'var2' => :false
     variables = net.instance_variable_get('@variables')
     evidence = net.instance_variable_get('@evidence')
     assert variables[:var2].set_in_evidence?(evidence)
     assert !variables[:var1].set_in_evidence?(evidence)
   end
   
-  def test_symbolize_evidence
+  def test_evidence_transformation
     # Create a network with each kind of variable and make sure evidence
     # transformation works.
     net = Sbn::Net.new("Test")
@@ -114,7 +113,7 @@ class TestNet < Test::Unit::TestCase # :nodoc:
     string_var.add_sample_point({:basic_var => :true, :string_var => "test", :num_var => 1.5})
     
     # should not be able to set covariables directly
-    assert_raise(RuntimeError) { net.set_evidence({:string_var_covar_1 => :true}) }
+    assert_raises(RuntimeError) { net.set_evidence({:string_var_covar_1 => :true}) }
     
     net.set_evidence 'BASIC VAR' => 'true', 'string_var' => "TesT", 'num_var' => 3
     evidence = net.instance_variable_get('@evidence')

@@ -14,13 +14,15 @@ Gem::Specification.new do |s|
   s.rubyforge_project = "sbn"
 
   s.files         = `git ls-files`.split("\n")
-  s.test_files    = `git ls-files -- {test,spec,features}/*`.split("\n")
+  s.test_files    = `git ls-files -- {test/unit,spec,features}/*`.split("\n")
   s.executables   = `git ls-files -- bin/*`.split("\n").map{ |f| File.basename(f) }
   s.require_paths = ["lib"]
 
-  s.add_development_dependency "rake",          "~> 0.9.2"
-  s.add_runtime_dependency     "builder",       "~> 3.0.0"
+  s.add_development_dependency "rake"
+  s.add_development_dependency "minitest", "~> 5.0"
+  s.add_development_dependency "pry"
+  s.add_runtime_dependency     "builder"
   s.add_runtime_dependency     "xml-simple",    "~> 1.1.0"
-  s.add_runtime_dependency     "i18n",          "~> 0.6.0"
-  s.add_runtime_dependency     "activesupport", "~> 3.1.0"
+  s.add_runtime_dependency     "i18n"
+  s.add_runtime_dependency     "activesupport"
 end

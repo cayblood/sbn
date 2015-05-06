@@ -3,6 +3,51 @@ require 'xmlsimple'
 
 module Sbn
   class Net
+
+    # Load the Variables from the JSON and hook up the parents for nodes that have them.
+    #
+    # @param json a hash or a JSON string to be parsed to the bayes net.
+    #
+    def self.from_json(json)
+      json = JSON.load(json) unless json.is_a?(Hash)
+      json_net = json[:network]
+
+      new(json_net[:name]).tap do |net|
+
+        connect_parents = []
+
+        json_net[:variables].each_with_index do |node, index|
+          variable =  case
+                      when node.has_key?(:state_thresholds)
+                        NumericVariable.from_json(net, node)
+                      else
+                        Variable.from_json(net, node)
+                      end
+
+          connect_parents << [variable, node[:parents]] unless node[:parents].empty?
+        end
+
+        connect_parents.each do |var, parent_names|
+          parents = parent_names.map { |n| net.variables[n] }
+          parents.map { |p| var.add_parent p }
+        end
+
+      end
+    end
+
+    # Returns a JSON Approximation of XMLBIF
+    #
+    def to_json
+      {
+        version: '0.3',
+        network: {
+          name: @name,
+          variables: @variables.values.map { |v| v.to_json_variable },
+          definitions: @variables.values.map{ |v| v.to_json_definition }
+        }
+      }
+    end
+
     # Returns a string containing a representation of the network in XMLBIF format.
     # http://www.cs.cmu.edu/afs/cs/user/fgcozman/www/Research/InterchangeFormat
     def to_xmlbif

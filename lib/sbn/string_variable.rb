@@ -46,12 +46,14 @@ module Sbn
   
   class StringVariable < Variable
     DEFAULT_NGRAM_SIZES = [3, 5, 10]
+    attr_reader :ngram_sizes
     
-    def initialize(net, name = '')
+    def initialize(net, name = '', options = {})
       @net = net
       @covariables = {}
       @covariable_children = []
       @covariable_parents = []
+      @ngram_sizes = options.fetch(:ngram_sizes, DEFAULT_NGRAM_SIZES)
       super(net, name, [], [])
     end
 
@@ -64,13 +66,12 @@ module Sbn
       # Make ngrams as small as 3 characters in length up to
       # the length of the string.  We may need to whittle this
       # down significantly to avoid severe computational burdens.
-      DEFAULT_NGRAM_SIZES.each {|n| ngrams.concat val.ngrams(n) }
+      @ngram_sizes.each {|n| ngrams.concat val.ngrams(n) }
       ngrams.uniq!
       ngrams.each do |ng|
         unless @covariables.has_key?(ng)
           # these probabilities are temporary and will get erased after learning
           newcovar = StringCovariable.new(@net, @name, ng, [0.5, 0.5])
-          count = 0
           @covariable_parents.each {|p| newcovar.add_parent(p) }
           @covariable_children.each {|p| newcovar.add_child(p) }
           @covariables[ng] = newcovar
@@ -81,9 +82,7 @@ module Sbn
     
     # returns an array of the variable's string covariables in alphabetical order
     def covariables # :nodoc:
-      returnval = []
-      @covariables.keys.sort.each {|key| returnval << @covariables[key] }
-      returnval
+      @covariables.keys.sort.map {|key| @covariables[key] }
     end
     
     def to_xmlbif_variable(xml) # :nodoc:
