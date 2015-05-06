@@ -63,7 +63,7 @@ class StringVariableTest < Minitest::Test # :nodoc:
   end
 
   def test_add_covariable
-    covar = Sbn::StringCovariable.new(@net, :text, 'something', [0.5, 0.5])
+    covar = Sbn::StringCovariable.new(@net, :text, 'something')
     assert !@text.covariables.include?(covar)
     @text.add_covariable(covar)
     assert @text.covariables.include?(covar)
@@ -78,12 +78,11 @@ class StringVariableTest < Minitest::Test # :nodoc:
     assert covariable_parents.include?(newvar)
   end
 
-  def test_add_sample_point
-    # make sure covariables are created with each sample point
+  def test_create_covariables_on_add_sample_point
     newtext = "newtext"
     assert_equal 3, @text.covariables.size
     @text.add_sample_point({text: newtext, category: :gas})
-    ngrams = @text.ngram_sizes.map { |len| newtext.ngrams(len) }
+    ngrams = @text.ngram_sizes.flat_map { |len| newtext.ngrams(len) }
     assert_equal 3 + ngrams.size, @text.covariables.size
   end
 
@@ -115,9 +114,8 @@ class StringVariableTest < Minitest::Test # :nodoc:
   end
   
   def test_is_complete_evidence_eh
-    evidence = {}
-    assert !@text.is_complete_evidence?(evidence)    
-    evidence = {category: :food, text: "foo"}
-    assert @text.is_complete_evidence?(evidence)
+    refute @text.is_complete_evidence?({})    
+    assert @text.is_complete_evidence?(category: :food, text: "foo")
   end
+
 end

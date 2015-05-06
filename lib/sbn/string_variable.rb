@@ -1,13 +1,21 @@
 module Sbn
   class StringCovariable < Variable # :nodoc:
     attr_reader :text_to_match
+
+    def self.from_json(net, json)
+      json = JSON.load(json) unless json.is_a?(Hash)
+
+      new(net, json[:manager_name], json[:text_to_match], json[:probabilities]).tap do |var|
+        var.set_probability_table json[:probability_table]
+      end
+    end
     
-    def initialize(net, manager_name, text_to_match, probabilities)
+    def initialize(net, manager_name, text_to_match)
       @@covar_count ||= 0
       @@covar_count += 1
       @manager_name = manager_name
       @text_to_match = text_to_match.downcase
-      super(net, "#{@manager_name}_covar_#{@@covar_count}", probabilities)
+      super(net, "#{@manager_name}_covar_#{@@covar_count}")
     end
     
     def to_xmlbif_variable(xml)
@@ -15,6 +23,10 @@ module Sbn
         x.property("ManagerVariableName = #{@manager_name.to_s}")
         x.property("TextToMatch = #{@text_to_match.inspect}")
       end
+    end
+
+    def to_json_variable
+      super.merge text_to_match: @text_to_match, manager_name: @manager_name
     end
     
     def evidence_name # :nodoc:
@@ -70,8 +82,7 @@ module Sbn
       ngrams.uniq!
       ngrams.each do |ng|
         unless @covariables.has_key?(ng)
-          # these probabilities are temporary and will get erased after learning
-          newcovar = StringCovariable.new(@net, @name, ng, [0.5, 0.5])
+          newcovar = StringCovariable.new(@net, @name, ng)
           @covariable_parents.each {|p| newcovar.add_parent(p) }
           @covariable_children.each {|p| newcovar.add_child(p) }
           @covariables[ng] = newcovar

@@ -3,7 +3,7 @@ module Sbn
     DEFAULT_FIRST_STDEV_STATE_COUNT = 14
     DEFAULT_SECOND_STDEV_STATE_COUNT = 6
     
-    attr_reader :state_thresholds
+    attr_reader :state_thresholds, :options
 
     def self.from_json(net, json)
       json = JSON.load(json) unless json.is_a?(Hash)
@@ -14,43 +14,48 @@ module Sbn
     end
     
     def initialize(net, name, probabilities = [], state_thresholds = [], options = {})
+      @options = options
       @state_count_one = options.fetch(:first_stdev_state_count, DEFAULT_FIRST_STDEV_STATE_COUNT).to_f.round
       @state_count_two = options.fetch(:second_stdev_state_count, DEFAULT_SECOND_STDEV_STATE_COUNT).to_f.round
       @state_count_one += 1 if @state_count_one.odd?
       @state_count_two += 1 if @state_count_two.odd?
-      @state_thresholds = state_thresholds
+      @state_thresholds = options.fetch(:state_thresholds, state_thresholds)
       states = options.fetch(:outcomes, generate_states_from_thresholds)
       super(net, name, probabilities, states)
     end
 
     # alter the state table based on the variance of the sample points
     def set_probabilities_from_sample_points! # :nodoc:
-      values = []
-      @sample_points.each {|evidence| values << evidence[@name] }
-      stdev = values.standard_deviation
-      average = values.average
-      increment_amount_for_first_stdev = stdev * 2.0 / @state_count_one.to_f
-      increment_amount_for_second_stdev = stdev * 2.0 / @state_count_two.to_f
-      current_position = average - (stdev * 2.0)
-      @state_thresholds = []
-      
-      # start on the left, two standard deviations away from the average
-      (@state_count_two / 2).times do
-        @state_thresholds << current_position
-        current_position += increment_amount_for_second_stdev
+      if @state_thresholds.empty?
+        values = @sample_points.map { |evidence| evidence[@name] }
+        stdev = values.standard_deviation
+        average = values.average
+        increment_amount_for_first_stdev = stdev * 2.0 / @state_count_one.to_f
+        increment_amount_for_second_stdev = stdev * 2.0 / @state_count_two.to_f
+        current_position = options.fetch(:lower_bound, average - (stdev * 2.0))
+
+        unless options[:lower_bound]
+          # start on the left, two standard deviations away from the average
+          (@state_count_two / 2).times do
+            @state_thresholds << current_position
+            current_position += increment_amount_for_second_stdev
+          end
+        end
+
+        # continue to add thresholds within the first standard deviation
+        @state_count_one.times do
+          @state_thresholds << current_position
+          current_position += increment_amount_for_first_stdev
+        end
+
+        # add thresholds to the second standard deviation on the right
+        (@state_count_two / 2).times do
+          @state_thresholds << current_position
+          current_position += increment_amount_for_second_stdev
+        end
+
       end
 
-      # continue to add thresholds within the first standard deviation
-      @state_count_one.times do
-        @state_thresholds << current_position
-        current_position += increment_amount_for_first_stdev
-      end
-
-      # add thresholds to the second standard deviation on the right
-      (@state_count_two / 2).times do
-        @state_thresholds << current_position
-        current_position += increment_amount_for_second_stdev
-      end
       @states = generate_states_from_thresholds
       
       # Now that states have been determined, call parent
