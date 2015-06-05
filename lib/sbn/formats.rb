@@ -43,7 +43,6 @@ module Sbn
         network: {
           name: @name,
           variables: @variables.values.map { |v| v.to_json_variable },
-          definitions: @variables.values.map{ |v| v.to_json_definition }
         }
       }
     end
