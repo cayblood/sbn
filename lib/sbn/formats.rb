@@ -10,7 +10,7 @@ module Sbn
     #
     def self.from_json(json)
       json = JSON.load(json) unless json.is_a?(Hash)
-      json_net = json[:network]
+      json_net = json.with_indifferent_access[:network]
 
       new(json_net[:name]).tap do |net|
 
