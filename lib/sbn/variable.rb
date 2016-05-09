@@ -10,6 +10,8 @@ module Sbn
       @name = name.to_underscore_sym
       @children = []
       @parents = []
+      @probabilities = []
+      @sample_points = []
       @states = []
       @state_frequencies = {} # used for storing sample points
       set_states(states)
@@ -158,7 +160,6 @@ module Sbn
     end
 
     def generate_probability_table # :nodoc:
-      @probab
       @probability_table = nil
       if @probabilities and @probabilities.size == state_combinations.size
         probs = @probabilities.dup

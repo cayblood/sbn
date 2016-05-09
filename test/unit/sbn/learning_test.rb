@@ -93,15 +93,4 @@ class LearningTest < Minitest::Test # :nodoc:
     freq = @category.instance_variable_get('@state_frequencies')
     assert_equal(freq, {[:groceries] => 1, [:gas] => 1, [:food] => 2})
   end
-
-  def test_net_add_sample_point
-    set = {:category => :food, :text => "foo"}
-    @net.add_sample_point(set)
-    variables = @net.instance_variable_get('@variables')
-    variables.each do |key, var|
-      sample_points = var.instance_variable_get('@sample_points')
-      assert sample_points.include?(set) if sample_points
-    end
-  end
-
 end

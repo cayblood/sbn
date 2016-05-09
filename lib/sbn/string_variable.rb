@@ -72,7 +72,6 @@ module Sbn
     # create co-variables when new n-grams are encountered
     def add_sample_point(evidence) # :nodoc:
       val = evidence[@name].downcase.strip
-      len = val.length
       ngrams = []
       
       # Make ngrams as small as 3 characters in length up to

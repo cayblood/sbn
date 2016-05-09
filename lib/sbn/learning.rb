@@ -1,7 +1,7 @@
 module Sbn
   class Variable
     NEGLIGIBLE_PROBABILITY = 0.0001
-    
+
     def is_complete_evidence?(evidence) # :nodoc:
       varnames = [evidence_name.to_s]
       @parents.each {|p| varnames << p.name.to_s }
@@ -52,9 +52,7 @@ module Sbn
 
       probabilities = []
       count_of_zero_prob_states = count_of_nonzero_prob_states = {}
-      last_state = @states.first
       state_combinations.each do |comb|
-        state = comb.last
         parent_comb = comb.dup
         parent_comb.pop
         prob = @state_frequencies[comb] / sums[parent_comb].to_f
@@ -76,7 +74,6 @@ module Sbn
       # pad the zero probabilities
       count = 0
       state_combinations.each do |comb|
-        state = comb.last
         parent_comb = comb.dup
         parent_comb.pop
         amount_to_subtract = count_of_zero_prob_states[parent_comb] *
@@ -123,7 +120,6 @@ module Sbn
       unlearned_variables = @variables.keys
       
       count = 0
-      size = @variables.size.to_f
       until unlearned_variables.empty?
         learnable_variables = @variables.reject do |name, var|
           reject = false

@@ -107,7 +107,7 @@ class NetTest < Minitest::Test # :nodoc:
     # Create a network with each kind of variable and make sure evidence
     # transformation works.
     net = Sbn::Net.new("Test")
-    basic_var = Sbn::Variable.new(net, :basic_var)
+    Sbn::Variable.new(net, :basic_var)
     string_var = Sbn::StringVariable.new(net, :string_var)
     num_var = Sbn::NumericVariable.new(net, :num_var, [0.5, 0.5], [1.0])
     string_var.add_sample_point({:basic_var => :true, :string_var => "test", :num_var => 1.5})

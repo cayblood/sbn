@@ -75,12 +75,12 @@ class Array # :nodoc:
   end
   
   def normalize
-    sum = self.inject(0.0) {|sum, e| sum += e }
+    sum = self.inject(0.0) {|s, e| s += e }
     self.map {|e| e.to_f / sum }
   end
   
   def normalize!
-    sum = self.inject(0.0) {|sum, e| sum += e }
+    sum = self.inject(0.0) {|s, e| s += e }
     self.map! {|e| e.to_f / sum }
   end
 end
