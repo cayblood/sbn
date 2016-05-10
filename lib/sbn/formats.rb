@@ -116,7 +116,7 @@ module Sbn
           manager_name = val if key == 'ManagerVariableName'
           text_to_match = eval(val) if key == 'TextToMatch'
           options[key.to_sym] = val.to_i if key =~ /stdev_state_count/
-          thresholds = val.map {|e| e.to_f } if key == 'StateThresholds'
+          thresholds = val.split(',').map {|e| e.to_f } if key == 'StateThresholds'
         end
         states = var['outcome']
         table = []

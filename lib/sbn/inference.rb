@@ -17,7 +17,7 @@ module Sbn
     # 
     # Optionally accepts a block that receives a number between 0 and 1 indicating
     # the percentage of completion. 
-    def query_variable(varname, callback = nil)
+    def query_variable(varname, sample_count = MCMC_DEFAULT_SAMPLE_COUNT, callback = nil)
       # keep track of number of times a state has been observed
       state_frequencies = {}
       varname = varname.to_underscore_sym
@@ -27,14 +27,14 @@ module Sbn
       e = generate_random_event
       relevant_evidence = e.reject {|key, val| @variables[key].set_in_evidence?(@evidence) }
 
-      MCMC_DEFAULT_SAMPLE_COUNT.times do |n|
+      sample_count.times do |n|
         state = e[varname]
         state_frequencies[state] += 1
 
         relevant_evidence.each do |vname, vstate|
           e[vname] = @variables[vname].get_random_state_with_markov_blanket(e)
         end
-        yield(n / MCMC_DEFAULT_SAMPLE_COUNT.to_f) if block_given?
+        yield(n / sample_count.to_f) if block_given?
       end
 
       # normalize results
