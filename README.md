@@ -38,7 +38,7 @@ Installation of SBN is simple:
  # gem install sbn
 
 == A Basic Example
-![Example Bayesian network](https://raw.githubusercontent.com/cayblood/sbn/master/docs/grass_wetness.png)
+[Example Bayesian network](https://raw.githubusercontent.com/cayblood/sbn/master/docs/grass_wetness.png)
 
 We'll begin with a network whose probabilities have been pre-determined. This
 example comes from the excellent <em>Artificial Intelligence: A Modern
